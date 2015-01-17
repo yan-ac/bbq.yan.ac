@@ -14,12 +14,15 @@ import Acid.BBQ
 import Layout.Basic
 import AcidProvider
 
+import Page.Index
+
 main :: IO ()
 main =
   withAcid Nothing $ \acid ->
     simpleHTTP nullConf $ do
-      msum [ 
-          dir "hello"  $ runApp acid page
+      msum [
+          runApp acid indexPage
+        , dir "hello"  $ runApp acid page
         , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
         , runApp acid e404Page
         ]
