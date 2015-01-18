@@ -16,6 +16,7 @@ import AcidProvider
 
 import Page.Index
 import Page.Register ( aboutRegister )
+import Page.Login ( aboutLogin )
 import Page.List
 import Page.E404
 
@@ -24,6 +25,7 @@ route runApp = do
   msum [
       runApp indexPage
     , aboutRegister runApp
+    , aboutLogin runApp
     , dir "list"   $ runApp listPage
     , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
     , runApp e404Page

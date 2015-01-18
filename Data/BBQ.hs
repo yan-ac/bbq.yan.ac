@@ -10,7 +10,7 @@ newtype AccountId = AccountId { unAccountId :: Int }
   deriving (Eq, Ord, Data, Typeable)
 newtype Email     = Email String
   deriving (Eq, Ord, Data, Typeable, Show)
-newtype Password  = Password String
+newtype Password  = Password { unPassword :: String }
   deriving (Eq, Ord, Data, Typeable, Show)
 newtype UserInfo  = UserInfo String
   deriving (Eq, Ord, Data, Typeable)

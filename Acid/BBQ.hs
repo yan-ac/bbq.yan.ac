@@ -11,6 +11,8 @@ import Data.IxSet           ( (@=), Proxy(..), getOne, empty )
 import qualified Data.IxSet as IxSet
 import Data.BBQ
 import Data.MaybeFail
+import Crypto.BCrypt
+import Data.ByteString.Char8 ( pack )
 
 initialBBQState :: BBQ
 initialBBQState = BBQ
@@ -96,8 +98,10 @@ authenticate (email, providedPassword) = do
   bbq@BBQ{..} <- ask
   case getOne $ accounts @= email of
     Nothing      -> return (Fail "USER NOT EXISTED.")
-    Just account -> 
-      if password account == providedPassword
+    Just account -> do
+      let packedPwd = pack (unPassword (password account))
+      let packedAttempt = pack (unPassword providedPassword)
+      if validatePassword packedPwd packedAttempt
         then return (Success (accountId account))
         else return (Fail "AUTH FAILED")
 
@@ -111,6 +115,7 @@ $(makeAcidic ''BBQ
   [ 'newAccount
   , 'resetPassword
   , 'updateUserInfo
+  , 'isEmailRegisterd
   , 'getAccountId
   , 'getUserInfo
   , 'authenticate
