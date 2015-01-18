@@ -14,8 +14,8 @@ import Data.BBQ
 import Acid.BBQ
 import Acid.VCodePool
 
-listPage :: App Response
-listPage = do 
+listPage :: Maybe AccountId -> App Response
+listPage authResult = do 
   msum [
          dir "accounts" $ do
            list <- query ListByEmail

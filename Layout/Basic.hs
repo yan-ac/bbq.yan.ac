@@ -7,8 +7,8 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import           Text.Blaze.Internal (customAttribute, customParent, stringValue)
 
-basic :: String -> H.Html -> H.Html
-basic title body =
+basicTemplate :: String -> [(String, String)] -> H.Html -> H.Html
+basicTemplate title navList body = 
   H.docTypeHtml $ do
     H.head $ do
       H.meta ! A.charset "utf-8"
@@ -30,9 +30,9 @@ basic title body =
                 H.ul ! A.class_ "right" $ do
                   mapM_ (\(url, title) -> sequence_
                     [ H.li ! A.class_ "divider" $ do ""
-                    , H.li $ do H.a ! A.href url $ do title
+                    , H.li $ do H.a ! A.href (stringValue url) $ do (H.toHtml title)
                     ])
-                    [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们"), ("/register", "注册"), ("/login", "登录")]
+                    navList
       customParent "main" ! A.class_ "row" $ do
         H.div ! A.class_ "small-10 large-8 small-centered columns" $ do
           body
@@ -40,3 +40,12 @@ basic title body =
       mapM_ (\url -> H.script ! A.src (stringValue ("/public/js/" ++ url)) $ do "")
             ["jquery.js", "foundation.min.js", "yan.ac.js"]
       H.script $ do "$(document).foundation();"
+
+basic :: (Maybe a) -> String -> H.Html -> H.Html
+basic authResult title body = do
+  let commonList = [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们")]
+  let loginedList = commonList ++ [("/dashboard", "个人中心")]
+  let unlogedList = commonList ++ [("/register", "注册"), ("/login", "登录")]
+  case authResult of
+    Nothing -> basicTemplate title unlogedList body
+    Just _  -> basicTemplate title loginedList body

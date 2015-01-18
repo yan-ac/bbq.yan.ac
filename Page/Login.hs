@@ -19,8 +19,9 @@ import Acid.BBQ
 import Acid.VCodePool
 import KeyHolder
 
-loginPage :: App Response
-loginPage = ok $ toResponse $ basic
+loginPage :: Maybe AccountId -> App Response
+loginPage authResult = ok $ toResponse $ basic
+  authResult
   "登录"
   ( do
       H.h1 $ do "登录你的账户"
@@ -38,14 +39,16 @@ loginPage = ok $ toResponse $ basic
                  ! A.name "login" $ do "登录"
   )
 
-loginHandler :: App Response
-loginHandler = do
+loginHandler :: Maybe AccountId -> App Response
+loginHandler authResult = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)
   email    <- body $ look "email"
   password <- body $ look "password"
   result   <- query $ Authenticate (Email email, Password password)
+  let resultTemplate = Layout.Result.result authResult
   case result of
     Fail _    -> forbidden $ toResponse $ basic
+                   authResult
                    "登录失败"
                    ( H.h1 $ do "密码不正确或者该邮箱尚未注册" )
     Success accountId -> do
@@ -54,16 +57,16 @@ loginHandler = do
       update $ NewAccountVCode accountId accessKey expireTime
       addCookie Session (mkCookie "accountId" (show accountId))
       addCookie Session (mkCookie "accessKey" (unVCode accessKey))
-      ok $ toResponse $ Layout.Result.result "登录成功"
+      ok $ toResponse $ resultTemplate "登录成功"
 
-aboutLogin runApp = do
+aboutLogin authResult runApp = do
   msum [
       dir "login" $ do
         nullDir
         method GET
-        runApp loginPage
+        runApp (loginPage authResult)
     , dir "login" $ do
         nullDir
         method POST
-        runApp loginHandler
+        runApp (loginHandler authResult)
     ]

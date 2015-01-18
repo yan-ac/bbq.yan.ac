@@ -2,8 +2,8 @@
 module Router where
 
 import Control.Applicative  (Applicative, Alternative)
-import Control.Monad.Trans.Control (MonadBaseControl)
 import Control.Monad
+import Control.Monad.Trans
 import Happstack.Server
 import Happstack.Server.RqData (getDataFn)
 import Text.Blaze           ((!))
@@ -19,15 +19,14 @@ import Page.Login ( aboutLogin )
 import Page.List
 import Page.E404
 
---route :: (App Response -> ServerPartT IO Response) -> ServerPartT IO Response
 route runApp' acid = do
   authResult <- checkUserAuth acid
   let runApp = runApp' acid
   msum [
-      runApp indexPage
-    , aboutRegister runApp
-    , aboutLogin runApp
-    , dir "list"   $ runApp listPage
+      runApp (indexPage authResult)
+    , aboutRegister authResult runApp
+    , aboutLogin authResult runApp
+    , dir "list"   $ runApp (listPage authResult)
     , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
-    , runApp e404Page
+    , runApp (e404Page authResult)
     ]

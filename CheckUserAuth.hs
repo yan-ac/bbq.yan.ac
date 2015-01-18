@@ -11,6 +11,7 @@ import Data.BBQ
 import Acid.BBQ
 import Data.VCodePool
 import Acid.VCodePool
+import Data.MaybeFail
 import Layout.Basic
 import AcidProvider
 import KeyHolder
@@ -28,8 +29,11 @@ checkUserAuth acid = do
     Right (accountId, accessKey) -> do
       now <- liftIO $ getCurrentTimeInSecond
       let vcodePool = vcodePoolState acid
-      let accountId' = read accountId :: AccountId
-      result <- query' vcodePool (VerifyAccountVCode accountId' (VCode accessKey) (ExpireTime now))
-      if result
-        then return (Just accountId')
-        else return Nothing
+      let accountId' = read accountId :: Int
+      let accountId'' = AccountId accountId'
+      authResult <- query' vcodePool (VerifyAccountVCode accountId'' (VCode accessKey) (ExpireTime now))
+      if authResult
+        then do
+          return (Just accountId'')
+        else do
+          return Nothing
