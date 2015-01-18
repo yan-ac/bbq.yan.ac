@@ -7,7 +7,7 @@ import Data.SafeCopy ( base, deriveSafeCopy )
 import Data.IxSet    ( Indexable(..), IxSet(..), ixFun, ixSet )
 
 newtype AccountId = AccountId { unAccountId :: Int }
-  deriving (Eq, Ord, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable, Read)
 newtype Email     = Email String
   deriving (Eq, Ord, Data, Typeable, Show)
 newtype Password  = Password { unPassword :: String }

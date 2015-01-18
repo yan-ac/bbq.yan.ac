@@ -7,4 +7,4 @@ import Router
 main :: IO ()
 main =
   withAcid Nothing $ \acid ->
-    simpleHTTP nullConf $ route (runApp acid)
+    simpleHTTP nullConf $ route runApp acid
