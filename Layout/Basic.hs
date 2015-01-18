@@ -17,7 +17,7 @@ basicTemplate title navList body =
       H.title (H.toHtml title)
       H.link ! A.rel "stylesheet"
              ! A.href "/public/css/foundation.css"
-      H.script ! A.src "/public/js/vendor/modernizr.js" $ do ""
+      H.script ! A.src "/public/js/modernizr.js" $ do ""
     H.body $ do
       H.nav ! A.class_ "top-bar"
             ! customAttribute "data-topbar" "" $ do
