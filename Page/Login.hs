@@ -3,6 +3,7 @@ module Page.Login where
 
 import Happstack.Server
 import Control.Monad
+import Control.Monad.Trans
 import           Text.Blaze ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
@@ -12,8 +13,11 @@ import Layout.Basic
 import Layout.Result
 import AcidProvider
 import Data.BBQ
+import Data.VCodePool
 import Data.MaybeFail
 import Acid.BBQ
+import Acid.VCodePool
+import KeyHolder
 
 loginPage :: App Response
 loginPage = ok $ toResponse $ basic
@@ -44,7 +48,13 @@ loginHandler = do
     Fail _    -> forbidden $ toResponse $ basic
                    "登录失败"
                    ( H.h1 $ do "密码不正确或者该邮箱尚未注册" )
-    Success _ -> ok $ toResponse $ Layout.Result.result "登录成功"
+    Success accountId -> do
+      accessKey <- liftIO $ getNextVCode
+      expireTime <- liftIO $ expireIn (Second 900)
+      update $ NewAccountVCode accountId accessKey expireTime
+      addCookie Session (mkCookie "accountId" (show accountId))
+      addCookie Session (mkCookie "accessKey" (unVCode accessKey))
+      ok $ toResponse $ Layout.Result.result "登录成功"
 
 aboutLogin runApp = do
   msum [
