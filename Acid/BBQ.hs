@@ -70,6 +70,13 @@ updateUserInfo (accountId', userInfo) = do
         { accounts = IxSet.updateIx accountId' newAccount accounts }      
       return $ Success ()
 
+isEmailRegisterd :: Email -> Query BBQ Bool
+isEmailRegisterd email = do
+  bbq@BBQ{..} <- ask
+  case getOne $ accounts @= email of
+    Nothing      -> return False
+    Just account -> return True
+
 getAccountId :: Email -> Query BBQ (MaybeFail AccountId)
 getAccountId email = do
   bbq@BBQ{..} <- ask

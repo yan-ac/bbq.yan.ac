@@ -16,8 +16,8 @@ basic title body =
              ! A.content "width=device-width, initial-scale=1.0"
       H.title (H.toHtml title)
       H.link ! A.rel "stylesheet"
-             ! A.href "public/css/foundation.css"
-      H.script ! A.src "public/js/vendor/modernizr.js" $ do ""
+             ! A.href "/public/css/foundation.css"
+      H.script ! A.src "/public/js/vendor/modernizr.js" $ do ""
     H.body $ do
       H.nav ! A.class_ "top-bar"
             ! customAttribute "data-topbar" "" $ do
@@ -32,7 +32,7 @@ basic title body =
                     [ H.li ! A.class_ "divider" $ do ""
                     , H.li $ do H.a ! A.href url $ do title
                     ])
-                    [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们")]
+                    [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们"), ("/register", "注册"), ("/login", "登录")]
       customParent "main" ! A.class_ "row" $ do
         H.div ! A.class_ "small-10 large-8 small-centered columns" $ do
           body

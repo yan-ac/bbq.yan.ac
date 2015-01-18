@@ -15,13 +15,14 @@ import Layout.Basic
 import AcidProvider
 
 import Page.Index
+import Page.Register ( aboutRegister )
 import Page.E404
 
 route :: (App Response -> ServerPartT IO Response) -> ServerPartT IO Response
 route runApp = do
   msum [
       runApp indexPage
-    , dir "hello"  $ runApp page
+    , aboutRegister runApp
     , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
     , runApp e404Page
     ]

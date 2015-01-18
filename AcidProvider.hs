@@ -22,6 +22,8 @@ import System.FilePath      ((</>))
 
 import Data.BBQ
 import Acid.BBQ
+import Data.VCodePool
+import Acid.VCodePool
 
 class HasAcidState m st where
    getAcidState :: m (AcidState st)
@@ -68,16 +70,19 @@ withLocalState mPath initialState =
 
 -- add a state here
 data Acid = Acid
-  { acidBBQState :: AcidState BBQ
+  { acidBBQState   :: AcidState BBQ
+  , vcodePoolState :: AcidState VCodePool
   }
 
 withAcid :: Maybe FilePath -> (Acid -> IO a) -> IO a
 withAcid mBasePath action =
   let basePath = fromMaybe "_state" mBasePath
       -- specify state path
-      bbqPath = Just $ basePath </> "BBQ"
-  in withLocalState bbqPath initialBBQState    $ \c ->
-     action (Acid c)
+      bbqPath  = Just $ basePath </> "BBQ"
+      poolPath = Just $ basePath </> "Pool"
+  in withLocalState bbqPath initialBBQState   $ \c ->
+     withLocalState poolPath initialVCodePool $ \g ->
+       action (Acid c g)
 
 newtype App a = App { unApp :: ServerPartT (ReaderT Acid IO) a }
     deriving ( Functor, Alternative, Applicative, Monad
@@ -88,8 +93,11 @@ newtype App a = App { unApp :: ServerPartT (ReaderT Acid IO) a }
 
 runApp :: Acid -> App a -> ServerPartT IO a
 runApp acid (App sp) =
-    mapServerPartT (flip runReaderT acid) sp
+  mapServerPartT (flip runReaderT acid) sp
 
 -- give state extractor
 instance HasAcidState App BBQ where
-    getAcidState = acidBBQState <$> ask
+  getAcidState = acidBBQState   <$> ask
+
+instance HasAcidState App VCodePool where
+  getAcidState = vcodePoolState <$> ask
