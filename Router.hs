@@ -26,7 +26,7 @@ route runApp' acid = do
       runApp (indexPage authResult)
     , aboutRegister authResult runApp
     , aboutLogin authResult runApp
-    , dir "list"   $ runApp (listPage authResult)
+--  , dir "list"   $ runApp (listPage authResult)
     , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
     , runApp (e404Page authResult)
     ]
