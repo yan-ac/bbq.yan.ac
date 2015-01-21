@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Layout.Basic (basicTemplate) where
+module Layout.Basic (mkBasicTemplate) where
 
 import Control.Monad
 import           Text.Blaze ((!))
@@ -7,8 +7,8 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import           Text.Blaze.Internal (customAttribute, customParent, stringValue)
 
-mkBasicTemplate :: String -> [(String, String)] -> H.Html -> H.Html
-mkBasicTemplate title navList body = 
+basicTemplate :: String -> [(String, String)] -> H.Html -> H.Html
+basicTemplate title navList body = 
   H.docTypeHtml $ do
     H.head $ do
       H.meta ! A.charset "utf-8"
@@ -41,11 +41,11 @@ mkBasicTemplate title navList body =
             ["jquery.js", "foundation.min.js", "yan.ac.js"]
       H.script $ do "$(document).foundation();"
 
-basicTemplate :: (Maybe a) -> String -> H.Html -> H.Html
-basicTemplate authResult title body = do
+mkBasicTemplate :: (Maybe a) -> String -> H.Html -> H.Html
+mkBasicTemplate authResult title body = do
   let commonList = [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们")]
   let loginedList = commonList ++ [("/dashboard", "个人中心")]
   let unlogedList = commonList ++ [("/register", "注册"), ("/login", "登录")]
   case authResult of
-    Nothing -> mkBasicTemplate title unlogedList body
-    Just _  -> mkBasicTemplate title loginedList body
+    Nothing -> basicTemplate title unlogedList body
+    Just _  -> basicTemplate title loginedList body

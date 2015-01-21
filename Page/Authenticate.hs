@@ -49,6 +49,7 @@ thenThrowError cond err = if cond then left err else right ()
 
 -- Login Handler --
 handleLogin = do
+  loginTpl <- askLoginTemplate
   template <- askBasicTemplate
   email    <- body $ look "email"
   password <- body $ look "password"
@@ -63,7 +64,7 @@ handleLogin = do
       update $ NewAccountVCode accountId accessKey expireTime
       addCookie Session (mkCookie "accountId" (show accountId))
       addCookie Session (mkCookie "accessKey" (unVCode accessKey))
-      ok $ simpleResponse template "登录成功"
+      ok $ simpleResponse loginTpl "登录成功"
 
 -- Register Handler --
 mkVerfLink :: String -> String -> String -> String
