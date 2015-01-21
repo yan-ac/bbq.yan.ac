@@ -8,21 +8,19 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import           Text.Blaze.Internal (customAttribute, customParent)
 
-import Layout.Basic
-import AcidProvider
+import Data.RequestState
 import Data.BBQ
 import Acid.BBQ
 import Acid.VCodePool
 
-listPage :: Maybe AccountId -> App Response
-listPage authResult = do 
-  msum [
-         dir "accounts" $ do
-           list <- query ListByEmail
-           let result = show list
-           ok $ toResponse $ H.toHtml result
-       , dir "vcode"     $ do
-           pool <- query GetPool
-           let result = show pool
-           ok $ toResponse $ H.toHtml result
-       ]
+showDatabase :: Handler Response
+showDatabase = msum [
+    dir "0.6077480115927756OR0.8599326119292527" $ do
+      list <- query ListByEmail
+      let result = show list
+      ok $ toResponse $ H.toHtml result
+  , dir "0.4999181595630944OR0.0781512644607573" $ do
+      pool <- query GetPool
+      let result = show pool
+      ok $ toResponse $ H.toHtml result
+  ]

@@ -12,6 +12,7 @@ import CheckUserAuth
 import Layout.Basic
 
 import Page.Authenticate
+import Page.List
 import Page.StaticPages
 
 dispatch :: (AcidState BBQ, AcidState VCodePool) -> ServerPartT IO Response
@@ -25,6 +26,7 @@ dispatch (bbq, vcodePool) = do
 route :: (Handler Response -> ServerPartT IO Response) -> ServerPartT IO Response
 route runHandler = msum [
     runHandler authenticate
+  , dir "list"   $ runHandler showDatabase
   , dir "public" $ serveDirectory DisableBrowsing [] "public"
   , runHandler staticPages
   ]

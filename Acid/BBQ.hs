@@ -105,11 +105,11 @@ authenticate (email, providedPassword) = do
         then return (Success (accountId account))
         else return (Fail "AUTH FAILED")
 
-listByEmail :: Query BBQ (MaybeFail [Account])
+listByEmail :: Query BBQ [Account]
 listByEmail = do
   BBQ{..} <- ask
   let accounts' = IxSet.toDescList (Proxy :: Proxy Email) accounts
-  return (Success accounts')
+  return accounts'
 
 $(makeAcidic ''BBQ
   [ 'newAccount
