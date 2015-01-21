@@ -44,7 +44,7 @@ basicTemplate title navList body =
 mkBasicTemplate :: (Maybe a) -> String -> H.Html -> H.Html
 mkBasicTemplate authResult title body = do
   let commonList = [("/rules", "比赛规则"), ("/faq", "FAQ"), ("/about-us", "关于我们")]
-  let loginedList = commonList ++ [("/dashboard", "个人中心")]
+  let loginedList = commonList ++ [("/dashboard", "个人中心"), ("/logout", "登出")]
   let unlogedList = commonList ++ [("/register", "注册"), ("/login", "登录")]
   case authResult of
     Nothing -> basicTemplate title unlogedList body

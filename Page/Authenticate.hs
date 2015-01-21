@@ -29,7 +29,11 @@ import Data.ByteString.Base64 (encode, decode)
 authenticate = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)
   msum [
-      dir "login" $ do
+      dir "logout" $ do
+        nullDir
+        method GET
+        handleLogout
+    , dir "login" $ do
         nullDir
         method POST
         handleLogin
@@ -65,6 +69,13 @@ handleLogin = do
       addCookie Session (mkCookie "accountId" (show accountId))
       addCookie Session (mkCookie "accessKey" (unVCode accessKey))
       ok $ simpleResponse loginTpl "登录成功"
+
+-- Logout Handler --
+handleLogout = do
+  plainTpl <- askPlainTemplate
+  expireCookie "accountId"
+  expireCookie "accessKey"
+  ok $ simpleResponse plainTpl "登出成功"
 
 -- Register Handler --
 mkVerfLink :: String -> String -> String -> String
