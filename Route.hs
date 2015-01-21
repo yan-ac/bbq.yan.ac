@@ -11,6 +11,8 @@ import Data.RequestState
 import CheckUserAuth
 import Layout.Basic
 
+import Page.StaticPages
+
 dispatch :: (AcidState BBQ, AcidState VCodePool) -> ServerPartT IO Response
 dispatch (bbq, vcodePool) = do
   authResult        <- checkUserAuth vcodePool
@@ -21,19 +23,6 @@ dispatch (bbq, vcodePool) = do
 
 route :: (Handler Response -> ServerPartT IO Response) -> ServerPartT IO Response
 route runHandler = msum [
-    dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
+    dir "public" $ serveDirectory DisableBrowsing [] "public"
+  , runHandler staticPages
   ]
-
-{-
-route runApp' acid = do
-  authResult <- checkUserAuth acid
-  let runApp = runApp' acid
-  msum [
-      runApp (indexPage authResult)
-    , aboutRegister authResult runApp
-    , aboutLogin authResult runApp
---  , dir "list"   $ runApp (listPage authResult)
-    , dir "public" $ serveDirectory DisableBrowsing ["index.html"] "public"
-    , runApp (e404Page authResult)
-    ]
--}
