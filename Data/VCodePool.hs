@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, FlexibleInstances #-}
 
 module Data.VCodePool where
 
@@ -16,28 +16,24 @@ newtype VCode = VCode { unVCode :: String }
 $(deriveSafeCopy 0 'base ''ExpireTime)  
 $(deriveSafeCopy 0 'base ''VCode)
 
-data EmailVCode = EmailVCode
-  { evEmail      :: Email
-  , evCode       :: VCode
-  , evExpireTime :: ExpireTime
+data VCodeRecord k = VCodeRecord {
+    primaryKey :: k
+  , vcode      :: VCode
+  , expireTime :: ExpireTime
   } deriving (Eq, Ord, Data, Typeable, Show)
-$(deriveSafeCopy 0 'base ''EmailVCode)
 
-data AccountVCode = AccountVCode
-  { avAccountId  :: AccountId
-  , avAccessKey  :: VCode
-  , avExpireTime :: ExpireTime
-  } deriving (Eq, Ord, Data, Typeable, Show)
-$(deriveSafeCopy 0 'base ''AccountVCode)
+$(deriveSafeCopy 0 'base ''VCodeRecord)
 
-instance Indexable EmailVCode where
-  empty = ixSet [ ixFun $ \bp -> [ evEmail bp ] ]
+instance Indexable (VCodeRecord Email) where
+  empty = ixSet [ ixFun $ \bp -> [ primaryKey bp ] ]
+instance Indexable (VCodeRecord AccountId) where
+  empty = ixSet [ ixFun $ \bp -> [ primaryKey bp ] ]
 
-instance Indexable AccountVCode where
-  empty = ixSet [ ixFun $ \bp -> [ avAccountId bp ] ]
+type VCodePool k = IxSet (VCodeRecord k)
 
-data VCodePool = VCodePool
-  { emailVCodes   :: IxSet EmailVCode
-  , accountVCodes :: IxSet AccountVCode
+data VCodePools = VCodePools {
+    newAccountPool  :: VCodePool Email
+  , resetPasswdPool :: VCodePool Email
+  , cookiePool      :: VCodePool AccountId
   } deriving (Data, Typeable, Show)
-$(deriveSafeCopy 0 'base ''VCodePool)
+$(deriveSafeCopy 0 'base ''VCodePools)

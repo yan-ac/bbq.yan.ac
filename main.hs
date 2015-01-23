@@ -36,14 +36,14 @@ withLocalState mPath initialState =
 
 withAcid 
   :: Maybe FilePath
-  -> ((AcidState BBQ, AcidState VCodePool) -> IO a)
+  -> ((AcidState BBQ, AcidState VCodePools) -> IO a)
   -> IO a
 withAcid mBasePath action =
   let basePath = fromMaybe "_state" mBasePath
       bbqPath  = Just $ basePath </> "BBQ"
       poolPath = Just $ basePath </> "Pool"
   in withLocalState bbqPath initialBBQState   $ \b ->
-     withLocalState poolPath initialVCodePool $ \p ->
+     withLocalState poolPath initialVCodePools $ \p ->
        action (b, p)
 
 main :: IO ()

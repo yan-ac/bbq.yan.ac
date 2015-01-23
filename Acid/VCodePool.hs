@@ -1,11 +1,12 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell,
-  TypeFamilies, RecordWildCards, NamedFieldPuns #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, 
+  TypeFamilies, FlexibleContexts, NamedFieldPuns #-}
 
 module Acid.VCodePool where
 
 import Control.Monad.Reader ( ask )
 import Control.Monad.State  ( get, put )
 import Control.Monad.Trans
+import Data.Data            ( Data, Typeable )
 import Data.Maybe
 import Data.Acid            ( Query, Update, makeAcidic )
 import Data.IxSet           ( (@=), Proxy(..), getOne, empty )
@@ -14,78 +15,82 @@ import Data.BBQ
 import Data.VCodePool
 import Data.MaybeFail
 
-initialVCodePool :: VCodePool
-initialVCodePool = VCodePool
-  { emailVCodes   = empty
-  , accountVCodes = empty
-  }
+initialVCodePools :: VCodePools
+initialVCodePools = VCodePools empty empty empty
 
-newEmailVCode :: Email -> VCode -> ExpireTime -> Update VCodePool ()
-newEmailVCode email vcode expireTime = do
-  pool@VCodePool{..} <- get
-  let emailVCode = EmailVCode {
-      evEmail      = email
-    , evCode       = vcode
-    , evExpireTime = expireTime
-    }
-  put $ pool
-    { emailVCodes   = IxSet.updateIx email emailVCode emailVCodes
-    , accountVCodes = accountVCodes
-    }
+updateNewAccountPool  pools pool = pools { newAccountPool  = pool }
+updateResetPasswdPool pools pool = pools { resetPasswdPool = pool }
+updateCookiePool      pools pool = pools { cookiePool      = pool }
 
-newAccountVCode :: AccountId -> VCode -> ExpireTime -> Update VCodePool ()
-newAccountVCode accountId vcode expireTime = do
-  pool@VCodePool{..} <- get
-  let accountVCode = AccountVCode {
-      avAccountId  = accountId
-    , avAccessKey  = vcode
-    , avExpireTime = expireTime
-    }
-  put $ pool
-    { emailVCodes   = emailVCodes
-    , accountVCodes = IxSet.updateIx accountId accountVCode accountVCodes
-    }
+newVCodeRecord
+  :: (IxSet.Indexable (VCodeRecord k), Typeable k, Ord k)
+  => (VCodePools -> VCodePool k)
+  -> (VCodePools -> VCodePool k -> VCodePools)
+  -> k -> VCode -> ExpireTime -> Update VCodePools ()
+newVCodeRecord extract update key vcode expireTime = do
+  let record = VCodeRecord key vcode expireTime
+  pools <- get
+  let pool = extract pools
+  let pool' = IxSet.updateIx key record pool
+  put $ update pools pool'
 
-verifyEmailVCode :: Email -> VCode -> ExpireTime -> Query VCodePool (MaybeFail ())
-verifyEmailVCode email givenCode now = do
-  pool@VCodePool{..} <- ask
-  case getOne $ emailVCodes @= email of
-    Nothing -> return $ (Fail "RECORD NOT EXISTED")
-    Just EmailVCode { evCode, evExpireTime } ->
-      if evCode /= givenCode
-        then return $ (Fail "INVALID VCODE")
-        else if evExpireTime < now
-          then return (Fail "EXPIRED RECORD")
-          else return (Success ())
+insertNewAccount   :: Email -> VCode -> ExpireTime -> Update VCodePools ()
+insertNewAccount k  = newVCodeRecord newAccountPool updateNewAccountPool k
+insertResetPasswd  :: Email -> VCode -> ExpireTime -> Update VCodePools ()
+insertResetPasswd k = newVCodeRecord resetPasswdPool updateResetPasswdPool k
+insertCookie       :: AccountId -> VCode -> ExpireTime -> Update VCodePools ()
+insertCookie k      = newVCodeRecord cookiePool updateCookiePool k
 
-verifyAccountVCode :: AccountId -> VCode -> ExpireTime -> Query VCodePool Bool
-verifyAccountVCode accountId givenAccessKey now = do
-  pool@VCodePool{..} <- ask
-  case getOne $ accountVCodes @= accountId of
-    Nothing -> return False
-    Just AccountVCode { avAccessKey, avExpireTime } ->
-      if avAccessKey /= givenAccessKey
-        then return False
-        else if avExpireTime < now
-          then return False
-          else return True
+verifyVCodeRecord
+  :: (IxSet.Indexable (VCodeRecord k), Typeable k, Ord k)
+  => (VCodePools -> VCodePool k)
+  -> k -> VCode -> ExpireTime -> Query VCodePools (Either String ())
+verifyVCodeRecord extract key givenCode now = do
+  pools <- ask
+  let pool = extract pools
+  case getOne $ pool @= key of
+    Nothing -> return $ (Left "验证记录不存在")
+    Just VCodeRecord { vcode, expireTime } ->
+      if vcode /= givenCode
+        then return $ (Left "无效的验证信息")
+        else if expireTime < now
+          then return $ (Left "验证信息已过期")
+          else return $ (Right ())
 
-deleteEmailVCode :: Email -> Update VCodePool ()
-deleteEmailVCode email = do
-  pool@VCodePool{..} <- get
-  put $ pool
-    { emailVCodes   = IxSet.deleteIx email emailVCodes
-    , accountVCodes = accountVCodes
-    }
+verifyNewAccount   :: Email -> VCode -> ExpireTime -> Query VCodePools (Either String ())
+verifyNewAccount k  = verifyVCodeRecord newAccountPool k
+verifyResetPasswd  :: Email -> VCode -> ExpireTime -> Query VCodePools (Either String ())
+verifyResetPasswd k = verifyVCodeRecord resetPasswdPool k
+verifyCookie       :: AccountId -> VCode -> ExpireTime -> Query VCodePools (Either String ())
+verifyCookie k      = verifyVCodeRecord cookiePool k
 
-getPool :: Query VCodePool VCodePool
-getPool = ask
+deleteVCodeRecord
+  :: (IxSet.Indexable (VCodeRecord k), Typeable k, Ord k)
+  => (VCodePools -> VCodePool k)
+  -> (VCodePools -> VCodePool k -> VCodePools)
+  -> k -> Update VCodePools ()
+deleteVCodeRecord extract update key = do
+  pools <- get
+  let pool = extract pools
+  let pool' = IxSet.deleteIx key pool
+  put $ update pools pool'
 
-$(makeAcidic ''VCodePool
-  [ 'newEmailVCode
-  , 'newAccountVCode
-  , 'verifyEmailVCode
-  , 'verifyAccountVCode
-  , 'deleteEmailVCode
-  , 'getPool
+deleteNewAccountRecord  :: Email -> Update VCodePools ()
+deleteNewAccountRecord  = deleteVCodeRecord newAccountPool updateNewAccountPool
+deleteResetPasswdRecord :: Email -> Update VCodePools ()
+deleteResetPasswdRecord = deleteVCodeRecord resetPasswdPool updateResetPasswdPool
+
+getPools :: Query VCodePools VCodePools
+getPools = ask
+
+$(makeAcidic ''VCodePools
+  [ 'insertNewAccount
+  , 'insertResetPasswd
+  , 'insertCookie
+  , 'verifyNewAccount
+  , 'verifyResetPasswd
+  , 'verifyCookie
+  , 'deleteNewAccountRecord
+  , 'deleteResetPasswdRecord
+  , 'getPools
   ])

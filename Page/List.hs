@@ -20,7 +20,7 @@ showDatabase = msum [
       let result = show list
       ok $ toResponse $ H.toHtml result
   , dir "0.4999181595630944OR0.0781512644607573" $ do
-      pool <- query GetPool
+      pool <- query GetPools
       let result = show pool
       ok $ toResponse $ H.toHtml result
   ]

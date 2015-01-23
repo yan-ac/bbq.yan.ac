@@ -14,10 +14,10 @@ import Page.Authenticate
 import Page.List
 import Page.StaticPages
 
-dispatch :: (AcidState BBQ, AcidState VCodePool) -> ServerPartT IO Response
-dispatch (bbq, vcodePool) = do
-  authResult        <- checkUserAuth vcodePool
-  let state          = mkRequestState bbq vcodePool authResult
+dispatch :: (AcidState BBQ, AcidState VCodePools) -> ServerPartT IO Response
+dispatch (bbq, vcodePools) = do
+  authResult        <- checkUserAuth vcodePools
+  let state          = mkRequestState bbq vcodePools authResult
   route $ runHandler state
 
 route :: (Handler Response -> ServerPartT IO Response) -> ServerPartT IO Response

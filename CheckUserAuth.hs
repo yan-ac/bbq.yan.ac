@@ -19,17 +19,15 @@ tryObtainAuthCookies :: RqData (String, String)
 tryObtainAuthCookies =
     (,) <$> lookCookieValue "accountId" <*> lookCookieValue "accessKey"
 
-checkUserAuth :: AcidState VCodePool -> ServerPartT IO (Maybe AccountId)
-checkUserAuth vcodePool = do
+checkUserAuth :: AcidState VCodePools -> ServerPartT IO (Maybe AccountId)
+checkUserAuth vcodePools = do
   c <- getDataFn tryObtainAuthCookies
   case c of
     Left _ -> return Nothing
     Right (accountId, accessKey) -> do
       now <- liftIO $ getCurrentTimeInSecond
       let accountId' =  AccountId (read accountId :: Int)
-      authResult <- query' vcodePool (VerifyAccountVCode accountId' (VCode accessKey) (ExpireTime now))
-      if authResult
-        then do
-          return (Just accountId')
-        else do
-          return Nothing
+      authResult <- query' vcodePools (VerifyCookie accountId' (VCode accessKey) (ExpireTime now))
+      case authResult of
+        Left  _ -> return Nothing
+        Right _ -> return (Just accountId')

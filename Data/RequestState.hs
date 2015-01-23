@@ -31,7 +31,7 @@ import Data.VCodePool
 
 data RequestState = RequestState
   { bbqState       :: AcidState BBQ
-  , vcodePoolState :: AcidState VCodePool
+  , vcodePoolState :: AcidState VCodePools
   , authResult     :: Maybe AccountId
   , basicTemplate  :: (String -> H.Html -> H.Html)
   , plainTemplate  :: (String -> H.Html -> H.Html)
@@ -40,7 +40,7 @@ data RequestState = RequestState
 
 mkRequestState
   :: AcidState BBQ
-  -> AcidState VCodePool
+  -> AcidState VCodePools
   -> Maybe AccountId
   -> RequestState
 mkRequestState bbq pool auth = 
@@ -71,7 +71,7 @@ class HasAcidState m st where
 instance HasAcidState Handler BBQ where
   getAcidState = bbqState       <$> ask
 
-instance HasAcidState Handler VCodePool where
+instance HasAcidState Handler VCodePools where
   getAcidState = vcodePoolState <$> ask
 
 query :: forall event m.

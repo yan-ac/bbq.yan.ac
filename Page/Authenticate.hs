@@ -65,7 +65,7 @@ handleLogin = do
     Success accountId -> do
       accessKey  <- liftIO $ getNextVCode
       expireTime <- liftIO $ expireIn (Second 900)
-      update $ NewAccountVCode accountId accessKey expireTime
+      update $ InsertCookie accountId accessKey expireTime
       addCookie Session (mkCookie "accountId" (show accountId))
       addCookie Session (mkCookie "accessKey" (unVCode accessKey))
       ok $ simpleResponse loginTpl "登录成功"
@@ -97,7 +97,7 @@ handleRegister = do
     let finalPwd = unpack . encode . fromJust $ bcryptedPwd    
     vcode       <- liftIO $ getNextVCode
     expireTime  <- liftIO $ expireIn (Second 900)
-    lift $ update $ NewEmailVCode (Email email) vcode expireTime
+    lift $ update $ InsertNewAccount (Email email) vcode expireTime
     let url = mkVerfLink email finalPwd (unVCode vcode)
     right url
 
@@ -120,23 +120,18 @@ handleFinishRegistration = do
   password <- queryString $ look "password"
   vcode    <- queryString $ look "vcode"
   now      <- liftIO $ getCurrentTimeInSecond
-  veResult <- query $ VerifyEmailVCode (Email email) (VCode vcode) (ExpireTime now)
 
   result <- runEitherT $ do
-    case veResult of
-      Fail "EXPIRED RECORD" -> left "验证信息已过期"
-      Fail _                -> left "验证失败"
-      Success _             -> right ()
-
+    lift $ query $ VerifyNewAccount (Email email) (VCode vcode) (ExpireTime now)
     let maybePwd = decode . pack $ password
-    thenThrowError (isLeft maybePwd) "验证失败"
+    thenThrowError (isLeft maybePwd) "无效的验证信息"
     let (Right packedPwd) = maybePwd
     let bcryptedPwd       = unpack packedPwd
     tryToCreateAccount   <- lift $ update $ NewAccount (Email email, Password bcryptedPwd)
     case tryToCreateAccount of
       Fail    _ -> left "该链接已注册，请直接登录您的账户"
       Success _ -> do
-        lift $ update $ DeleteEmailVCode (Email email)
+        lift $ update $ DeleteNewAccountRecord (Email email)
         right "注册成功"
 
   case result of
