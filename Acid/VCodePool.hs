@@ -33,12 +33,9 @@ newVCodeRecord extract update key vcode expireTime = do
   let pool' = IxSet.updateIx key record pool
   put $ update pools pool'
 
-insertNewAccount   :: Email -> VCode -> ExpireTime -> Update VCodePools ()
-insertNewAccount k  = newVCodeRecord newAccountPool updateNewAccountPool k
-insertResetPasswd  :: Email -> VCode -> ExpireTime -> Update VCodePools ()
-insertResetPasswd k = newVCodeRecord resetPasswdPool updateResetPasswdPool k
-insertCookie       :: AccountId -> VCode -> ExpireTime -> Update VCodePools ()
-insertCookie k      = newVCodeRecord cookiePool updateCookiePool k
+insertNewAccount  = newVCodeRecord newAccountPool updateNewAccountPool
+insertResetPasswd = newVCodeRecord resetPasswdPool updateResetPasswdPool
+insertCookie      = newVCodeRecord cookiePool updateCookiePool
 
 verifyVCodeRecord
   :: (IxSet.Indexable (VCodeRecord k), Typeable k, Ord k)
@@ -56,12 +53,9 @@ verifyVCodeRecord extract key givenCode now = do
           then return $ (Left "验证信息已过期")
           else return $ (Right ())
 
-verifyNewAccount   :: Email -> VCode -> ExpireTime -> Query VCodePools (Either String ())
-verifyNewAccount k  = verifyVCodeRecord newAccountPool k
-verifyResetPasswd  :: Email -> VCode -> ExpireTime -> Query VCodePools (Either String ())
-verifyResetPasswd k = verifyVCodeRecord resetPasswdPool k
-verifyCookie       :: AccountId -> VCode -> ExpireTime -> Query VCodePools (Either String ())
-verifyCookie k      = verifyVCodeRecord cookiePool k
+verifyNewAccount  = verifyVCodeRecord newAccountPool
+verifyResetPasswd = verifyVCodeRecord resetPasswdPool
+verifyCookie      = verifyVCodeRecord cookiePool
 
 deleteVCodeRecord
   :: (IxSet.Indexable (VCodeRecord k), Typeable k, Ord k)
@@ -74,9 +68,7 @@ deleteVCodeRecord extract update key = do
   let pool' = IxSet.deleteIx key pool
   put $ update pools pool'
 
-deleteNewAccountRecord  :: Email -> Update VCodePools ()
 deleteNewAccountRecord  = deleteVCodeRecord newAccountPool updateNewAccountPool
-deleteResetPasswdRecord :: Email -> Update VCodePools ()
 deleteResetPasswdRecord = deleteVCodeRecord resetPasswdPool updateResetPasswdPool
 
 getPools :: Query VCodePools VCodePools
