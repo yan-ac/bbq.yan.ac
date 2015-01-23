@@ -47,6 +47,7 @@ withAcid mBasePath action =
        action (b, p)
 
 main :: IO ()
-main =
+main = do
+  putStrLn "BBQ is listening on 8000."
   withAcid Nothing $ \acid ->
     simpleHTTP nullConf $ dispatch acid
