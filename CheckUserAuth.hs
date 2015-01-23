@@ -12,7 +12,6 @@ import Data.BBQ
 import Acid.BBQ
 import Data.VCodePool
 import Acid.VCodePool
-import Data.MaybeFail
 import KeyHolder
 
 tryObtainAuthCookies :: RqData (String, String)

@@ -10,10 +10,9 @@ import Data.Either
 import           Text.Blaze ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import           Text.Blaze.Internal (customAttribute, customParent, stringValue)
+import           Text.Blaze.Internal (stringValue)
 
 import Data.RequestState
-import Data.MaybeFail
 import Data.BBQ
 import Data.VCodePool
 import Acid.BBQ
@@ -59,10 +58,8 @@ handleLogin = do
   password <- body $ look "password"
   result   <- query $ Authenticate (Email email, Password password)
   case result of
-    Fail _  -> forbidden $ toResponse $ template
-                 "登录失败"
-                 ( H.h1 $ do "密码不正确或者该邮箱尚未注册" )
-    Success accountId -> do
+    Left errMsg     -> forbidden $ toResponse $ template "登录失败" ( H.h1 $ do H.toHtml errMsg )
+    Right accountId -> do
       accessKey  <- liftIO $ getNextVCode
       expireTime <- liftIO $ expireIn (Second 900)
       update $ InsertCookie accountId accessKey expireTime
@@ -127,12 +124,9 @@ handleFinishRegistration = do
     thenThrowError (isLeft maybePwd) "无效的验证信息"
     let (Right packedPwd) = maybePwd
     let bcryptedPwd       = unpack packedPwd
-    tryToCreateAccount   <- lift $ update $ NewAccount (Email email, Password bcryptedPwd)
-    case tryToCreateAccount of
-      Fail    _ -> left "该链接已注册，请直接登录您的账户"
-      Success _ -> do
-        lift $ update $ DeleteNewAccountRecord (Email email)
-        right "注册成功"
+    lift $ update $ NewAccount (Email email, Password bcryptedPwd)
+    lift $ update $ DeleteNewAccountRecord (Email email)
+    right "注册成功"
 
   case result of
     Left errMsg -> forbidden $ simpleResponse template errMsg

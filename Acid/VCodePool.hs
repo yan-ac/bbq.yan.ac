@@ -13,7 +13,6 @@ import Data.IxSet           ( (@=), Proxy(..), getOne, empty )
 import qualified Data.IxSet as IxSet
 import Data.BBQ
 import Data.VCodePool
-import Data.MaybeFail
 
 initialVCodePools :: VCodePools
 initialVCodePools = VCodePools empty empty empty
