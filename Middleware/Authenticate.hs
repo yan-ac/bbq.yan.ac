@@ -1,4 +1,4 @@
-module CheckUserAuth where
+module Middleware.Authenticate where
 
 import Control.Applicative     ((<$>), (<*>))
 import Control.Monad
@@ -18,8 +18,8 @@ tryObtainAuthCookies :: RqData (String, String)
 tryObtainAuthCookies =
     (,) <$> lookCookieValue "accountId" <*> lookCookieValue "accessKey"
 
-checkUserAuth :: AcidState VCodePools -> ServerPartT IO (Maybe AccountId)
-checkUserAuth vcodePools = do
+checkAuthCookie :: AcidState VCodePools -> ServerPartT IO (Maybe AccountId)
+checkAuthCookie vcodePools = do
   c <- getDataFn tryObtainAuthCookies
   case c of
     Left _ -> return Nothing

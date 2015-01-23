@@ -8,7 +8,7 @@ import Data.BBQ
 import Data.VCodePool
 import Data.RequestState
 
-import CheckUserAuth
+import Middleware.Authenticate
 
 import Page.Authenticate
 import Page.List
@@ -16,7 +16,7 @@ import Page.StaticPages
 
 dispatch :: (AcidState BBQ, AcidState VCodePools) -> ServerPartT IO Response
 dispatch (bbq, vcodePools) = do
-  authResult        <- checkUserAuth vcodePools
+  authResult        <- checkAuthCookie vcodePools
   let state          = mkRequestState bbq vcodePools authResult
   route $ runHandler state
 
