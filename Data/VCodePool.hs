@@ -6,10 +6,6 @@ import Data.Data       ( Data, Typeable )
 import Data.SafeCopy   ( base, deriveSafeCopy )
 import Data.IxSet      ( Indexable(..), IxSet(..), ixFun, ixSet )
 import Control.Applicative
-import Data.Time       ( formatTime )
-import Data.Time.Clock ( getCurrentTime )
-import System.Locale   ( defaultTimeLocale )
-import System.Random
 
 import Data.BBQ
 
