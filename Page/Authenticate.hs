@@ -29,22 +29,13 @@ import Data.ByteString.Base64 (encode, decode)
 authenticate = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)
   msum [
-      dir "logout" $ do
-        nullDir
-        method GET
-        handleLogout
-    , dir "login" $ do
-        nullDir
-        method POST
-        handleLogin
-    , dir "register" $ do
-        nullDir
-        method POST
-        handleRegister
-    , dir "finish-registration" $ do
-        nullDir
-        method GET
-        handleFinishRegistration
+      dir "logout"              $ nullDir >> method  GET >> handleLogout
+    , dir "login"               $ nullDir >> method POST >> handleLogin
+    , dir "register"            $ nullDir >> method POST >> handleRegister
+    , dir "finish-registration" $ nullDir >> method  GET >> handleFinishRegistration
+    , dir "forget-password"     $ nullDir >> method POST >> handleForgetPassword
+    , dir "reset-password"      $ nullDir >> method  GET >> newResetPasswordPage
+    , dir "reset-password"      $ nullDir >> method POST >> handleResetPassword
     ]
 
 simpleResponse template msg = toResponse $ template msg ( H.h1 $ do H.toHtml msg)
