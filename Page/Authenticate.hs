@@ -18,6 +18,7 @@ import Data.VCodePool
 import Acid.BBQ
 import Acid.VCodePool
 import KeyHolder
+import Middleware.SendEmail
 
 import Crypto.BCrypt
 import Text.Email.Validate
@@ -100,15 +101,14 @@ handleRegister = do
 
   case result of
     Left errMsg -> badRequest $ simpleResponse template errMsg
-    Right url   -> ok $ toResponse $ template
-      "校验邮箱"
-      ( do
-          H.h1 $ do "请登录邮箱以完成注册"
-          H.p $ do
-            "请点击"
-            H.a ! A.href (stringValue url) $ do "链接"
-            "以完成注册。"
-      )
+    Right url   -> do
+      liftIO $ sendNotification email "BBQ.Yan.ac 账户注册"
+        ( "有人使用该邮箱地址在 BBQ.Yan.ac 上注册账户。" ++
+          "如果这不是你本人的行为，请忽略此邮件。" ++
+          "否则，请点击链接完成你的注册：" ++ url
+        )
+
+      ok $ simpleResponse template "请登录邮箱以完成注册"
 
 -- Finish Registration Handler --
 handleFinishRegistration = do
