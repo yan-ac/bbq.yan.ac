@@ -103,9 +103,10 @@ handleRegister = do
     Left errMsg -> badRequest $ simpleResponse template errMsg
     Right url   -> do
       liftIO $ sendNotification email "BBQ.Yan.ac 账户注册"
-        ( "有人使用该邮箱地址在 BBQ.Yan.ac 上注册账户。" ++
-          "如果这不是你本人的行为，请忽略此邮件。" ++
-          "否则，请点击链接完成你的注册：" ++ url
+        (  "有人使用该邮箱地址在 BBQ.Yan.ac 上注册账户。"
+        ++ "如果这不是你本人的行为，请忽略此邮件。"
+        ++ "否则，请点击链接完成你的注册："
+        ++ "https://bbq.yan.ac" ++ url
         )
 
       ok $ simpleResponse template "请登录邮箱以完成注册"
