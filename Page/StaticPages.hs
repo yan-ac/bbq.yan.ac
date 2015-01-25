@@ -6,7 +6,7 @@ import Control.Monad
 import           Text.Blaze ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import           Text.Blaze.Internal (customAttribute, customParent)
+--import           Text.Blaze.Internal (customAttribute, customParent)
 
 import Data.RequestState
 
@@ -63,6 +63,7 @@ loginPage template = do
                     ! A.name "password"
             H.button ! A.type_ "submit"
                      ! A.name "login" $ do "登录"
+          H.a ! A.href "/forget-password" $ do "忘记密码？"
       )
 
 registerPage template = do
@@ -77,7 +78,7 @@ registerPage template = do
                  ! A.method "post" $ do
             "邮箱"
             H.br
-            H.input ! A.type_ "text"
+            H.input ! A.type_ "email"
                     ! A.name "email"
             "密码（12—24 位）"
             H.br
@@ -86,3 +87,16 @@ registerPage template = do
             H.button ! A.type_ "submit"
                      ! A.name "register" $ do "注册"
       )
+
+forgetPasswordPage template = ok $ toResponse $ template
+  "重置密码"
+  ( do
+    H.h1 $ do "重置密码"
+    H.form ! A.action "/forget-password"
+           ! A.method "get" $ do
+      "输入你的邮箱"
+      H.input ! A.type_ "email"
+              ! A.name "email"
+      H.button ! A.type_ "submit"
+               ! A.name "reset-password" $ do "重置密码"
+  )
