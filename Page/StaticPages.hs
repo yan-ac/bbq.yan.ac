@@ -6,7 +6,6 @@ import Control.Monad
 import           Text.Blaze ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
---import           Text.Blaze.Internal (customAttribute, customParent)
 
 import Data.RequestState
 
@@ -14,8 +13,9 @@ staticPages = do
   template <- askBasicTemplate
   msum [
       indexPage template
-    , dir "login"    $ loginPage template
-    , dir "register" $ registerPage template
+    , dir "login"           $ loginPage template
+    , dir "register"        $ registerPage template
+    , dir "forget-password" $ forgetPasswordPage template
     , e404Page template
     ]
 
