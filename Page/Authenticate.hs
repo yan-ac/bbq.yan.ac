@@ -181,8 +181,9 @@ handleResetPassword = do
     lift $ query $ VerifyResetPasswd (Email email) (VCode vcode) (ExpireTime now)
     thenThrowError ((length password) < 12 || (length password) > 24) "密码应当为 12—24 位"
     bcryptedPwd <- liftIO $ hashPasswordUsingPolicy fastBcryptHashingPolicy (pack password)
-    let finalPwd = unpack . encode . fromJust $ bcryptedPwd
+    let finalPwd = unpack . fromJust $ bcryptedPwd
     lift $ update $ ResetPassword (Email email, Password finalPwd)
+    lift $ update $ DeleteResetPasswdRecord (Email email)
 
   case result of
     Left errMsg -> forbidden $ simpleResponse template errMsg
