@@ -93,7 +93,7 @@ forgetPasswordPage template = ok $ toResponse $ template
   ( do
     H.h1 $ do "重置密码"
     H.form ! A.action "/forget-password"
-           ! A.method "get" $ do
+           ! A.method "post" $ do
       "输入你的邮箱"
       H.input ! A.type_ "email"
               ! A.name "email"
