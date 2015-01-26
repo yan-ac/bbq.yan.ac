@@ -74,7 +74,7 @@ sendVerificationLink = do
       vcode      <- liftIO $ getNextVCode
       expireTime <- liftIO $ expireIn (Second 3600)
       update $ InsertNewAccount (Email email) vcode expireTime
-      let url = "https://bbq.yan.ac/fill-info" ++ (mkFillInfoLink email (unVCode vcode))
+      let url = "https://bbq.yan.ac" ++ (mkFillInfoLink email (unVCode vcode))
       liftIO $ sendNotification email "BBQ.Yan.ac 账户注册"
         (  "有人使用该邮箱地址在 BBQ.Yan.ac 上注册账户。"
         ++ "如果这不是你本人的行为，请忽略此邮件。"
@@ -104,7 +104,7 @@ mkNewAccount = do
     plainPwd     <- extractEither password'
     cryptedPwd   <- liftIO $ hashPasswordUsingPolicy fastBcryptHashingPolicy (pack plainPwd)
     let finalPwd = unpack . fromJust $ cryptedPwd
-    lift $ update $ NewAccount (Email email, Password finalPwd) --personalInfo
+    lift $ update $ NewAccount (Email email, Password finalPwd) personalInfo
 
   case result of
     Left errMsg -> badRequest $ simpleResponse template errMsg

@@ -12,23 +12,20 @@ newtype Email     = Email String
   deriving (Eq, Ord, Data, Typeable, Show)
 newtype Password  = Password { unPassword :: String }
   deriving (Eq, Ord, Data, Typeable, Show)
-newtype UserInfo  = UserInfo String
-  deriving (Eq, Ord, Data, Typeable)
 $(deriveSafeCopy 0 'base ''AccountId)
 $(deriveSafeCopy 0 'base ''Email)
 $(deriveSafeCopy 0 'base ''Password)
-$(deriveSafeCopy 0 'base ''UserInfo)
+
+type PersonalInfo = (String, String, String)
 
 instance Show AccountId where
   show (AccountId accountId) = show accountId
-instance Show UserInfo where
-  show (UserInfo info) = info
 
 data Account = Account
-  { accountId :: AccountId
-  , email     :: Email
-  , password  :: Password
-  , userInfo  :: UserInfo
+  { accountId    :: AccountId
+  , email        :: Email
+  , password     :: Password
+  , personalInfo :: PersonalInfo
   }
   deriving (Eq, Ord, Data, Typeable, Show)
 $(deriveSafeCopy 0 'base ''Account)

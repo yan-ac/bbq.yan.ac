@@ -21,18 +21,18 @@ initialBBQState = BBQ
 
 type MaybeFail t = Either String t
 
-newAccount :: (Email, Password) -> Update BBQ (MaybeFail AccountId)
-newAccount (email, password) = do
+newAccount :: (Email, Password) -> (String, String, String) -> Update BBQ (MaybeFail AccountId)
+newAccount (email, password) personalInfo = do
   bbq@BBQ{..} <- get
   case getOne $ accounts @= email of
     Just _  -> return (Left "该邮箱已被注册")
     Nothing -> do
       let thisAccountId = nextAccountId
       let thisAccount = Account {
-          accountId = thisAccountId
-        , email     = email
-        , password  = password
-        , userInfo  = UserInfo "{}"
+          accountId    = thisAccountId
+        , email        = email
+        , password     = password
+        , personalInfo = personalInfo
         }
       put $ bbq
         { nextAccountId = AccountId ((unAccountId thisAccountId) + 13)
@@ -47,28 +47,7 @@ resetPassword (email, password) = do
     Nothing         -> return (Left "用户不存在")
     Just oldAccount -> do
       let accountId' = accountId oldAccount
-      let newAccount = Account {
-          accountId = accountId'
-        , email     = email
-        , password  = password
-        , userInfo  = userInfo oldAccount
-        }
-      put $ bbq
-        { accounts = IxSet.updateIx accountId' newAccount accounts }      
-      return $ Right ()
-
-updateUserInfo :: (AccountId, UserInfo) -> Update BBQ (MaybeFail ())
-updateUserInfo (accountId', userInfo) = do
-  bbq@BBQ{..} <- get
-  case getOne $ accounts @= accountId' of
-    Nothing         -> return (Left "用户不存在")
-    Just oldAccount -> do
-      let newAccount = Account {
-          accountId = accountId'
-        , email     = email oldAccount
-        , password  = password oldAccount
-        , userInfo  = userInfo
-        }
+      let newAccount = oldAccount { password = password }
       put $ bbq
         { accounts = IxSet.updateIx accountId' newAccount accounts }      
       return $ Right ()
@@ -86,13 +65,6 @@ getAccountId email = do
   case getOne $ accounts @= email of
     Nothing      -> return (Left "用户不存在")
     Just account -> return (Right (accountId account))
-
-getUserInfo :: AccountId -> Query BBQ (MaybeFail UserInfo)
-getUserInfo accountId = do
-  bbq@BBQ{..} <- ask
-  case getOne $ accounts @= accountId of
-    Nothing      -> return (Left "用户不存在")
-    Just account -> return (Right (userInfo account))
 
 authenticate :: (Email, Password) -> Query BBQ (MaybeFail AccountId)
 authenticate (email, providedPassword) = do
@@ -115,10 +87,8 @@ listByEmail = do
 $(makeAcidic ''BBQ
   [ 'newAccount
   , 'resetPassword
-  , 'updateUserInfo
   , 'isEmailRegisterd
   , 'getAccountId
-  , 'getUserInfo
   , 'authenticate
   , 'listByEmail
   ])
