@@ -14,7 +14,6 @@ staticPages = do
   msum [
       indexPage template
     , dir "login"           $ loginPage template
-    , dir "register"        $ registerPage template
     , dir "forget-password" $ forgetPasswordPage template
     , e404Page template
     ]
@@ -64,28 +63,6 @@ loginPage template = do
             H.button ! A.type_ "submit"
                      ! A.name "login" $ do "登录"
           H.a ! A.href "/forget-password" $ do "忘记密码？"
-      )
-
-registerPage template = do
-  authResult <- askAuthResult
-  case authResult of
-    Just _  -> seeOther dashboardURI (toResponse loginedMsg)
-    Nothing -> ok $ toResponse $ template
-      "注册"
-      ( do
-          H.h1 $ do "注册友谊赛"
-          H.form ! A.action "/register"
-                 ! A.method "post" $ do
-            "邮箱"
-            H.br
-            H.input ! A.type_ "email"
-                    ! A.name "email"
-            "密码（12—24 位）"
-            H.br
-            H.input ! A.type_ "password"
-                    ! A.name "password"
-            H.button ! A.type_ "submit"
-                     ! A.name "register" $ do "注册"
       )
 
 forgetPasswordPage template = ok $ toResponse $ template
