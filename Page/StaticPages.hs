@@ -22,9 +22,7 @@ staticPages = do
 
 indexPage template = do
   nullDir
-  ok $ toResponse $ template
-    "首页"
-    ( H.h1 $ do "第一届烧烤节语言学友谊赛" )
+  serveFile (guessContentTypeM mimeTypes) "public/index.html"
 
 e404Page template = notFound $ toResponse $ template
   "页面不存在"

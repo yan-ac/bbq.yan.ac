@@ -12,18 +12,23 @@ h1, h3, p {
 .navbar .navbar-brand {
   color: #fff;
 }
+section.row {
+  border-width: 1px 0px;
+  border-image: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.30) 50%, rgba(0, 0, 0, 0) 100%) 5% / 1 / 0px stretch;
+  box-sizing: border-box;
+}
 .carousel {
   margin: 60px 0 0;
   height: 500px;
 }
 #carousel-0 {
-  background-image: url('../img/carousel_0.png');
+  background-image: url('/public/images/carousel/0.png');
 }
 #carousel-1 {
-  background-image: url('../img/carousel_1.png');
+  background-image: url('/public/images/carousel/1.png');
 }
 #carousel-2 {
-  background-image: url('../img/carousel_2.png');
+  background-image: url('/public/images/carousel/2.png');
 }
 .carousel-inner > .item {
   height: 500px;
