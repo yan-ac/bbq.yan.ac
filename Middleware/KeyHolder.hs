@@ -1,4 +1,4 @@
-module KeyHolder where
+module Middleware.KeyHolder where
 
 import Control.Applicative
 import Data.Time       ( formatTime )

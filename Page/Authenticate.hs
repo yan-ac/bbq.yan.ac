@@ -17,7 +17,7 @@ import Data.BBQ
 import Data.VCodePool
 import Acid.BBQ
 import Acid.VCodePool
-import KeyHolder
+import Middleware.KeyHolder
 import Middleware.SendEmail
 
 import Crypto.BCrypt
