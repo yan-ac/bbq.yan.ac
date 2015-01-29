@@ -3,6 +3,7 @@ module Middleware.SendEmail where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
+import Data.BBQ (Email(..))
 import Network.Mail.SMTP
 
 {-
@@ -16,8 +17,8 @@ sendNotification recipent title content = do
     [Address Nothing recipent'] [] [] title' [plainTextPart content']
 -}
 
-sendNotification :: String -> String -> String -> IO ()
-sendNotification recipent title content = do
+sendNotification :: Email -> String -> String -> IO ()
+sendNotification (Email recipent) title content = do
   putStrLn $ "Recipent: " ++ recipent
   putStrLn $ "Title:    " ++ title
   putStrLn $ "Content:"

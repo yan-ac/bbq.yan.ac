@@ -76,7 +76,7 @@ handleForgetPassword = do
       vcode      <- liftIO $ getNextVCode
       expireTime <- liftIO $ expireIn (Second 3600)
       update     $ InsertResetPasswd (Email email) vcode expireTime
-      liftIO $ sendNotification email "BBQ.Yan.ac 密码重置"
+      liftIO $ sendNotification (Email email) "BBQ.Yan.ac 密码重置"
         (  "有人试图在 BBQ.Yan.ac 上重置该账户的密码。"
         ++ "如果这不是你本人的行为，请忽略此邮件。"
         ++ "否则，请点击链接完成密码重置："
