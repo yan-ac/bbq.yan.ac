@@ -32,7 +32,7 @@ ming styleList scriptList logined title body =
             styleList ++ [
                 "http://yan.ac/public/fonts/fonts.css"
               , "/public/images/vendors/bootstrap.min.css"
-              , "http://libs.useso.com/js/font-awesome/4.2.0/css/font-awesome.min.css"
+              , "/public/images/vendors/font-awesome.min.css"
               , "/public/css/bbq.yan.ac.css"
               ]
 
@@ -69,6 +69,6 @@ ming styleList scriptList logined title body =
         body
       mapM_ mkScriptLink $
             scriptList ++ [
-              "http://libs.useso.com/js/jquery/2.1.1/jquery.min.js"
-            , "http://libs.useso.com/js/bootstrap/3.2.0/js/bootstrap.min.js"
+              "/public/images/vendors/jquery.min.js"
+            , "/public/images/vendors/bootstrap.min.js"
             ]
