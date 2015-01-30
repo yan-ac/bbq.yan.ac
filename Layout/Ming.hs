@@ -31,7 +31,7 @@ ming styleList scriptList logined title body =
       mapM_ mkStyleSheetLink $
             styleList ++ [
                 "http://yan.ac/public/fonts/fonts.css"
-              , "http://libs.useso.com/js/bootstrap/3.2.0/css/bootstrap.min.css"
+              , "/public/images/vendors/bootstrap.min.css"
               , "http://libs.useso.com/js/font-awesome/4.2.0/css/font-awesome.min.css"
               , "/public/css/bbq.yan.ac.css"
               ]
