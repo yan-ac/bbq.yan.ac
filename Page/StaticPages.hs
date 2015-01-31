@@ -14,7 +14,6 @@ staticPages = do
   template <- loadTmplWithAuth basicTemplate
   msum [
       indexPage template
-    , dir "login"           $ loginPage template
     , e404Page template
     ]
 
@@ -31,34 +30,3 @@ e404Page template = notFound $ toResponse $ template
       H.p $ do "您所请求的页面不存在。该页面可能尚未建立，请耐心等候。"
       H.p $ do "如果您自身拥有相关技能（JavaScript/HTML/CSS 或者 Haskell），并愿意帮助我们加速网站的建设工作，可以联系我们。"
   )
-
--- GET of Dynamic Pages --
-
-dashboardURI :: String
-dashboardURI = "/dashboard"
-
-loginedMsg :: String
-loginedMsg = "您已登陆"
-
-loginPage template = do
-  authResult <- askAuthResult
-  case authResult of
-    Just _  -> seeOther dashboardURI (toResponse loginedMsg)
-    Nothing -> ok $ toResponse $ template
-      "登录"
-      ( do
-          H.h1 $ do "登录你的账户"
-          H.form ! A.action "/login"
-                 ! A.method "post" $ do
-            "邮箱"
-            H.br
-            H.input ! A.type_ "text"
-                    ! A.name "email"
-            "密码"
-            H.br
-            H.input ! A.type_ "password"
-                    ! A.name "password"
-            H.button ! A.type_ "submit"
-                     ! A.name "login" $ do "登录"
-          H.a ! A.href "/forget-password" $ do "忘记密码？"
-      )

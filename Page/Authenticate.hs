@@ -2,7 +2,6 @@
 module Page.Authenticate (Page.Authenticate.authenticate) where
 
 import Happstack.Server
-import Happstack.Server.RqData (getDataFn)
 import Control.Monad
 import Control.Monad.Trans
 import Control.Monad.Trans.Either
@@ -20,13 +19,11 @@ import Acid.VCodePool
 import Middleware.KeyHolder
 import Middleware.SendEmail
 import Layout.Basic
+import Layout.ValidatableForm
+import Data.ValidatableForm
+import Utils
 
-import Crypto.BCrypt
-import Text.Email.Validate
-import Data.ByteString.Char8 (pack, unpack)
-import Data.Maybe
-import Data.ByteString.Base64 (encode, decode)
-
+authenticate :: Handler Response
 authenticate = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)
   msum [
@@ -35,27 +32,44 @@ authenticate = do
     , dir "logout" $ nullDir >> method  GET >> handleLogout
     ]
 
-simpleResponse template msg = toResponse $ template msg ( H.h1 $ do H.toHtml msg)
-
-thenThrowError cond err = if cond then left err else right ()
-
 -- Login Handler --
+mkLoginPage = do
+  template   <- loadTmplWithAuth formTemplate'
+  authResult <- askAuthResult
+  case authResult of
+    Just _  -> seeOther dashboardURI (toResponse loginedMsg)
+    Nothing -> ok $ toResponse $ template "登录" "/login" html
+  where html = do {
+    sequence_ . formItemsToHtml $ getFormItems safeLoginForm;
+    H.a ! A.href "/forget-password" 
+        ! A.style "float: right" $ do "忘记密码？";
+  }
+
 handleLogin = do
   loginedTpl <- loadTmplAsLogined basicTemplate
   plainTpl   <- loadTmplAsPlain   basicTemplate
+  postData   <- runForm safeLoginForm
 
-  email    <- body $ look "email"
-  password <- body $ look "password"
-  result   <- query $ Authenticate (Email email, Password password)
+  result <- runEitherT $ do
+    (email, password) <- extractEither postData
+    authResult <- lift $ query $ Authenticate (email, password)
+    accountId  <- extractEither authResult
+    accessKey  <- liftIO $ getNextVCode
+    expireTime <- liftIO $ expireIn (Second 900)
+    lift $ update $ InsertCookie accountId accessKey expireTime
+    lift $ addCookie Session (mkCookie "accountId" (show accountId))
+    lift $ addCookie Session (mkCookie "accessKey" (unVCode accessKey))
+
   case result of
-    Left errMsg     -> forbidden $ toResponse $ plainTpl "登录失败" ( H.h1 $ do H.toHtml errMsg )
-    Right accountId -> do
-      accessKey  <- liftIO $ getNextVCode
-      expireTime <- liftIO $ expireIn (Second 900)
-      update $ InsertCookie accountId accessKey expireTime
-      addCookie Session (mkCookie "accountId" (show accountId))
-      addCookie Session (mkCookie "accessKey" (unVCode accessKey))
-      ok $ simpleResponse loginedTpl "登录成功"
+    Left errMsg -> forbidden $ toResponse $ plainTpl "登录失败" ( H.h1 $ do H.toHtml errMsg )
+    Right _     -> ok $ simpleResponse loginedTpl "登录成功"
+
+safeLoginForm :: (Monad m, TypesafeForm m) => m (Email, Password)
+safeLoginForm = do
+  email    <- askEmail "email" "邮件地址"
+  password <- askPassword "password" "密码"
+  addButton "login" "登录"
+  return (email, password)
 
 -- Logout Handler --
 handleLogout = do
