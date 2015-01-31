@@ -12,14 +12,15 @@ import Data.RequestState
 import Data.BBQ
 import Acid.BBQ
 import Acid.VCodePool
+import qualified Config
 
 showDatabase :: Handler Response
 showDatabase = msum [
-    dir "0.6077487756OR0.859932612az592527" $ do
+    dir "accounts" $ dir Config.superUserPassword $ do
       list <- query ListByEmail
       let result = show list
       ok $ toResponse $ H.toHtml result
-  , dir "0.499915EFG4OR0.0781512M0wd607573" $ do
+  , dir "vcodes"   $ dir Config.superUserPassword $ do
       pool <- query GetPools
       let result = show pool
       ok $ toResponse $ H.toHtml result
