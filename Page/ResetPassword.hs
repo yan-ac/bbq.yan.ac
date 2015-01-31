@@ -21,10 +21,8 @@ import Data.ValidatableForm
 import Utils
 
 import Crypto.BCrypt
-import Text.Email.Validate
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Maybe
-import Data.ByteString.Base64 (encode, decode)
 
 entry = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)

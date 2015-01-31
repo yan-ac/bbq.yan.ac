@@ -1,12 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Page.Registration (entry) where
 
-import           Text.Blaze ((!))
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
-import           Text.Blaze.Internal (stringValue)
 import Crypto.BCrypt
-import Text.Email.Validate
 
 import Control.Monad
 import Control.Monad.Trans
@@ -16,7 +11,6 @@ import Happstack.Server
 
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Maybe
-import Data.Char
 
 import Data.RequestState
 import Data.ValidatableForm
@@ -27,6 +21,7 @@ import Acid.VCodePool
 import Middleware.KeyHolder
 import Middleware.SendEmail
 
+import Utils
 import Layout.Basic
 import Layout.ValidatableForm
 
@@ -39,27 +34,7 @@ entry = do
     , dir "fill-info" $ nullDir >> method POST >> mkNewAccount
     ]
 
--- Helper Functions --
-inRange lo hi val = val >= lo && val <= hi
-isHanChar = inRange 0x4e00 0x9fff . ord
-
-simpleResponse template msg = toResponse $ template msg ( H.h1 $ do H.toHtml msg)
-
-vrEmail = isValid . pack
-vrPassword = inRange 12 24 . length
-
-thenThrowError cond err = if cond then left err else right ()
-elseThrowError cond err = if cond then right () else left err
-extractEither e = case e of
-  Left a  -> left a
-  Right b -> right b
 -- Make /Register Page --
-dashboardURI :: String
-dashboardURI = "/dashboard"
-
-loginedMsg :: String
-loginedMsg = "您已登录"
-
 mkRegisterPage = do
   template   <- loadTmplWithAuth formTemplate
   authResult <- askAuthResult
@@ -67,12 +42,9 @@ mkRegisterPage = do
     Just _  -> seeOther dashboardURI (toResponse loginedMsg)
     Nothing -> ok $ toResponse $ template "注册友谊赛" "/register" $ getFormItems safeRegisterForm
 
--- Send Verification Link --
-mkFillInfoLink (Email email) (VCode vcode) = "/fill-info?email=" ++ email ++ "&vcode=" ++ vcode
-
 sendVerificationLink = do
   template <- loadTmplWithAuth basicTemplate
-  postData <- getValidator safeRegisterForm
+  postData <- runForm safeRegisterForm
 
   result <- runEitherT $ do
     email        <- extractEither postData
@@ -82,11 +54,11 @@ sendVerificationLink = do
     vcode      <- liftIO $ getNextVCode
     expireTime <- liftIO $ expireIn (Second 3600)
     lift $ update $ InsertNewAccount email vcode expireTime
-    let url = "https://bbq.yan.ac" ++ (mkFillInfoLink email vcode)
     liftIO $ sendNotification email "BBQ.Yan.ac 账户注册"
       (  "有人使用该邮箱地址在 BBQ.Yan.ac 上注册账户。"
       ++ "如果这不是你本人的行为，请忽略此邮件。"
-      ++ "否则，请点击链接完成你的注册：" ++ url
+      ++ "否则，请点击链接完成你的注册："
+      ++ mkVerificationLink True "/fill-info" email vcode
       )
 
   case result of
@@ -97,19 +69,19 @@ sendVerificationLink = do
 mkFillInfoPage = do
   basicTmpl  <- loadTmplWithAuth basicTemplate
   formTmpl   <- loadTmplWithAuth formTemplate
-  authResult <- fetchEmailVCode
+  authResult <- fetchEmailVCode VerifyNewAccount
   case authResult of
     Left errMsg          -> forbidden $ simpleResponse basicTmpl errMsg
     Right (email, vcode) -> ok $ toResponse $ formTmpl
       "填写密码及个人信息"
-      (mkFillInfoLink email vcode)
+      (mkVerificationLink False "/fill-info" email vcode)
       (getFormItems safeFillInfoForm)
 
 -- Make New Account --
 mkNewAccount = do
   template   <- loadTmplWithAuth basicTemplate
-  authResult <- fetchEmailVCode
-  postData   <- getValidator safeFillInfoForm
+  authResult <- fetchEmailVCode VerifyNewAccount
+  postData   <- runForm safeFillInfoForm
 
   result <- runEitherT $ do
     (email, _)  <- extractEither authResult
@@ -122,17 +94,6 @@ mkNewAccount = do
     Left errMsg -> badRequest $ simpleResponse template errMsg
     Right _     -> ok $ simpleResponse template "注册成功"
 
--- Verification --
-fetchEmailVCode = do
-  email'     <- queryString $ look "email"
-  vcode'     <- queryString $ look "vcode"
-  let email  = Email email'
-  let vcode  = VCode vcode'
-  now        <- liftIO $ getCurrentTimeInSecond
-  authResult <- query $ VerifyNewAccount email vcode (ExpireTime now)
-  case authResult of
-    Left errMsg -> return (Left errMsg)
-    Right _     -> return (Right (email, vcode))
 
 -- Pages --
 safeRegisterForm :: (Monad m, TypesafeForm m) => m Email
