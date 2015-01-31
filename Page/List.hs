@@ -15,11 +15,11 @@ import Acid.VCodePool
 
 showDatabase :: Handler Response
 showDatabase = msum [
-    dir "0.6077480115927756OR0.8599326119292527" $ do
+    dir "0.6077487756OR0.859932612az592527" $ do
       list <- query ListByEmail
       let result = show list
       ok $ toResponse $ H.toHtml result
-  , dir "0.4999181595630944OR0.0781512644607573" $ do
+  , dir "0.499915EFG4OR0.0781512M0wd607573" $ do
       pool <- query GetPools
       let result = show pool
       ok $ toResponse $ H.toHtml result
