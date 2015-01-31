@@ -15,7 +15,6 @@ staticPages = do
   msum [
       indexPage template
     , dir "login"           $ loginPage template
-    , dir "forget-password" $ forgetPasswordPage template
     , e404Page template
     ]
 
@@ -63,16 +62,3 @@ loginPage template = do
                      ! A.name "login" $ do "登录"
           H.a ! A.href "/forget-password" $ do "忘记密码？"
       )
-
-forgetPasswordPage template = ok $ toResponse $ template
-  "重置密码"
-  ( do
-    H.h1 $ do "重置密码"
-    H.form ! A.action "/forget-password"
-           ! A.method "post" $ do
-      "输入你的邮箱"
-      H.input ! A.type_ "email"
-              ! A.name "email"
-      H.button ! A.type_ "submit"
-               ! A.name "reset-password" $ do "重置密码"
-  )
