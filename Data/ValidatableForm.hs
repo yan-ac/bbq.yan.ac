@@ -80,5 +80,5 @@ instance (Monad m, HasRqData m, Functor m) => TypesafeForm (EitherT String m) wh
     where msg = case errMsg of Just x  -> x
                                Nothing -> "不正确的参数"
 
-getValidator form = do
+runForm form = do
   runEitherT form
