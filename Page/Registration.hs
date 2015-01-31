@@ -27,6 +27,9 @@ import Acid.VCodePool
 import Middleware.KeyHolder
 import Middleware.SendEmail
 
+import Layout.Basic
+import Layout.ValidatableForm
+
 entry = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)
   msum [
@@ -55,21 +58,21 @@ dashboardURI :: String
 dashboardURI = "/dashboard"
 
 loginedMsg :: String
-loginedMsg = "您已登陆"
+loginedMsg = "您已登录"
 
 mkRegisterPage = do
-  template   <- askBasicTemplate
+  template   <- loadTmplWithAuth formTemplate
   authResult <- askAuthResult
   case authResult of
     Just _  -> seeOther dashboardURI (toResponse loginedMsg)
-    Nothing -> ok $ toResponse $ template "注册" registerPage
+    Nothing -> ok $ toResponse $ template "注册友谊赛" "/register" $ getFormItems safeRegisterForm
 
 -- Send Verification Link --
 mkFillInfoLink (Email email) (VCode vcode) = "/fill-info?email=" ++ email ++ "&vcode=" ++ vcode
 
 sendVerificationLink = do
-  template <- askBasicTemplate
-  postData <- getValidatorFromValidatableForm mkSafeRegisterForm
+  template <- loadTmplWithAuth basicTemplate
+  postData <- getValidator safeRegisterForm
 
   result <- runEitherT $ do
     email        <- extractEither postData
@@ -92,17 +95,21 @@ sendVerificationLink = do
 
 -- Make Fill Info Page --
 mkFillInfoPage = do
-  template   <- askBasicTemplate
+  basicTmpl  <- loadTmplWithAuth basicTemplate
+  formTmpl   <- loadTmplWithAuth formTemplate
   authResult <- fetchEmailVCode
   case authResult of
-    Left errMsg          -> forbidden $ simpleResponse template errMsg
-    Right (email, vcode) -> ok $ toResponse $ template "填写信息" (fillInfoPage email vcode)
+    Left errMsg          -> forbidden $ simpleResponse basicTmpl errMsg
+    Right (email, vcode) -> ok $ toResponse $ formTmpl
+      "填写密码及个人信息"
+      (mkFillInfoLink email vcode)
+      (getFormItems safeFillInfoForm)
 
 -- Make New Account --
 mkNewAccount = do
-  template   <- askBasicTemplate
+  template   <- loadTmplWithAuth basicTemplate
   authResult <- fetchEmailVCode
-  postData   <- getValidatorFromValidatableForm mkSafeFillInfoForm
+  postData   <- getValidator safeFillInfoForm
 
   result <- runEitherT $ do
     (email, _)  <- extractEither authResult
@@ -128,18 +135,14 @@ fetchEmailVCode = do
     Right _     -> return (Right (email, vcode))
 
 -- Pages --
-mkSafeRegisterForm :: (Monad m, TypesafeForm m) => m Email
-mkSafeRegisterForm = do
+safeRegisterForm :: (Monad m, TypesafeForm m) => m Email
+safeRegisterForm = do
   email     <- askEmail "email" "填写你的邮件地址"
   addButton "register" "发送验证邮件"
   return email
 
-registerPage = do
-  H.h1 "注册友谊赛"
-  getHtmlFromValidatableForm "/register" mkSafeRegisterForm
-
-mkSafeFillInfoForm :: (Monad m, TypesafeForm m) => m (Password, (String, String, String))
-mkSafeFillInfoForm = do
+safeFillInfoForm :: (Monad m, TypesafeForm m) => m (Password, (String, String, String))
+safeFillInfoForm = do
   password  <- askPassword "password" "输入你的密码（12—24 位，任意字符均可）"
   repeat    <- askPassword "repeat"   "重复输入你的密码"
   realName  <- askText     "realname" "输入你的真实姓名，全汉字，不超过六个汉字"
@@ -151,7 +154,3 @@ mkSafeFillInfoForm = do
   should (test 2 6  realName) (Just "姓名格式不正确")
   should (test 4 20 school)   (Just "校名格式不正确")
   return (password, (realName, school, grade))
-
-fillInfoPage email vcode = do
-  H.h1 "填写密码及个人信息"
-  getHtmlFromValidatableForm (stringValue $ mkFillInfoLink email vcode) mkSafeFillInfoForm
