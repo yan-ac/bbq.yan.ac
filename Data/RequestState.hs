@@ -8,7 +8,7 @@ module Data.RequestState
   , runHandler
   , query, update
   , askAuthResult
-  , askBasicTemplate, askPlainTemplate, askLoginTemplate
+  , loadTmplWithAuth, loadTmplAsLogined, loadTmplAsPlain
   )
  where
 
@@ -25,17 +25,13 @@ import Data.Text.Lazy       (Text)
 import qualified Text.Blaze.Html5 as H
 import Happstack.Server
 
-import Layout.Basic
 import Data.BBQ
 import Data.VCodePool
 
 data RequestState = RequestState
-  { bbqState       :: AcidState BBQ
-  , vcodePoolState :: AcidState VCodePools
-  , authResult     :: Maybe AccountId
-  , basicTemplate  :: (String -> H.Html -> H.Html)
-  , plainTemplate  :: (String -> H.Html -> H.Html)
-  , loginTemplate  :: (String -> H.Html -> H.Html)
+  { bbqState         :: AcidState BBQ
+  , vcodePoolState   :: AcidState VCodePools
+  , authResult       :: Maybe AccountId
   }
 
 mkRequestState
@@ -48,9 +44,6 @@ mkRequestState bbq pool auth =
     bbqState       = bbq
   , vcodePoolState = pool
   , authResult     = auth
-  , basicTemplate  = mkBasicTemplate auth
-  , plainTemplate  = mkBasicTemplate Nothing
-  , loginTemplate  = mkBasicTemplate (Just 1)
   }
 
 newtype Handler a = Handler { unHandler :: ServerPartT (ReaderT RequestState IO) a }
@@ -105,11 +98,13 @@ askAuthResult = authResult <$> ask
 
 -- Template   --
 
-askBasicTemplate :: Handler (String -> H.Html -> H.Html)
-askBasicTemplate = basicTemplate <$> ask
+loadTmplWithAuth :: (Bool -> a) -> Handler a
+loadTmplWithAuth tmpl = do
+  auth <- authResult <$> ask
+  case auth of
+    Just _  -> loadTmplAsLogined tmpl
+    Nothing -> loadTmplAsPlain   tmpl
 
-askPlainTemplate :: Handler (String -> H.Html -> H.Html)
-askPlainTemplate = plainTemplate <$> ask
+loadTmplAsLogined tmpl = return $ tmpl True
 
-askLoginTemplate :: Handler (String -> H.Html -> H.Html)
-askLoginTemplate = loginTemplate <$> ask
+loadTmplAsPlain   tmpl = return $ tmpl False

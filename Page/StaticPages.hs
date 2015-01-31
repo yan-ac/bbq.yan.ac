@@ -8,9 +8,10 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
 import Data.RequestState
+import Layout.Basic
 
 staticPages = do
-  template <- askBasicTemplate
+  template <- loadTmplWithAuth basicTemplate
   msum [
       indexPage template
     , dir "login"           $ loginPage template

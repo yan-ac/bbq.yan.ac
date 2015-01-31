@@ -19,6 +19,7 @@ import Acid.BBQ
 import Acid.VCodePool
 import Middleware.KeyHolder
 import Middleware.SendEmail
+import Layout.Basic
 
 import Crypto.BCrypt
 import Text.Email.Validate
@@ -42,31 +43,32 @@ thenThrowError cond err = if cond then left err else right ()
 
 -- Login Handler --
 handleLogin = do
-  loginTpl <- askLoginTemplate
-  template <- askBasicTemplate
+  loginedTpl <- loadTmplAsLogined basicTemplate
+  plainTpl   <- loadTmplAsPlain   basicTemplate
+
   email    <- body $ look "email"
   password <- body $ look "password"
   result   <- query $ Authenticate (Email email, Password password)
   case result of
-    Left errMsg     -> forbidden $ toResponse $ template "登录失败" ( H.h1 $ do H.toHtml errMsg )
+    Left errMsg     -> forbidden $ toResponse $ plainTpl "登录失败" ( H.h1 $ do H.toHtml errMsg )
     Right accountId -> do
       accessKey  <- liftIO $ getNextVCode
       expireTime <- liftIO $ expireIn (Second 900)
       update $ InsertCookie accountId accessKey expireTime
       addCookie Session (mkCookie "accountId" (show accountId))
       addCookie Session (mkCookie "accessKey" (unVCode accessKey))
-      ok $ simpleResponse loginTpl "登录成功"
+      ok $ simpleResponse loginedTpl "登录成功"
 
 -- Logout Handler --
 handleLogout = do
-  plainTpl <- askPlainTemplate
+  plainTpl <- loadTmplAsPlain basicTemplate
   expireCookie "accountId"
   expireCookie "accessKey"
   ok $ simpleResponse plainTpl "登出成功"
 
 -- Forget Password Handler --
 handleForgetPassword = do
-  template  <- askBasicTemplate
+  template  <- loadTmplWithAuth basicTemplate
   email     <- body $ look "email"
   isExisted <- query $ GetAccountId (Email email)
 
@@ -86,7 +88,7 @@ handleForgetPassword = do
 
 -- New Reset Password Page --
 newResetPasswordPage = do
-  template <- askBasicTemplate
+  template <- loadTmplWithAuth basicTemplate
   email    <- queryString $ look "email"
   vcode    <- queryString $ look "vcode"
   now      <- liftIO $ getCurrentTimeInSecond
@@ -111,7 +113,7 @@ newResetPasswordPage = do
 
 -- Reset Password Handler --
 handleResetPassword = do
-  template <- askBasicTemplate
+  template <- loadTmplWithAuth basicTemplate
   email    <- queryString $ look "email"
   vcode    <- queryString $ look "vcode"
   now      <- liftIO $ getCurrentTimeInSecond
