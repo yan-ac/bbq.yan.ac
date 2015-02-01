@@ -8,7 +8,6 @@ import Data.IxSet
 import           Text.Blaze ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import           Text.Blaze.Internal (customAttribute, customParent)
 
 import Data.RequestState
 import Layout.Basic

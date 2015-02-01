@@ -66,6 +66,13 @@ getAccountId email = do
     Nothing      -> return (Left "用户不存在")
     Just account -> return (Right (accountId account))
 
+getAccount :: AccountId -> Query BBQ (MaybeFail Account)
+getAccount id = do
+  bbq@BBQ{..} <- ask
+  case getOne $ accounts @= id of
+    Nothing      -> return (Left "用户不存在")
+    Just account -> return (Right account)
+
 authenticate :: (Email, Password) -> Query BBQ (MaybeFail AccountId)
 authenticate (email, providedPassword) = do
   bbq@BBQ{..} <- ask
@@ -91,4 +98,5 @@ $(makeAcidic ''BBQ
   , 'getAccountId
   , 'authenticate
   , 'listByEmail
+  , 'getAccount
   ])
