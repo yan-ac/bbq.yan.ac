@@ -108,7 +108,7 @@ safeFillInfoForm = do
   repeat    <- askPassword "repeat"   "重复输入你的密码"
   realName  <- askText     "realname" "输入你的真实姓名，全汉字，不超过六个汉字"
   school    <- askText     "school"   "输入你的学校的中文全称，全汉字，不超过二十个汉字"
-  grade     <- askChoice   "grade"    "选择你的年级" [(x, x) | x <- ["初一", "初二", "初三", "高一", "高二", "高三"]]
+  grade     <- askChoice   "grade"    "选择你的年级" [(x, x) | x <- ["六年级", "初一", "初二", "初三", "高一", "高二", "高三"]]
   addButton "submit" "完成注册"
   should (password == repeat) (Just "两次密码输入不一致")
   let test lo hi x = all isHanChar x && inRange lo hi (length x)
