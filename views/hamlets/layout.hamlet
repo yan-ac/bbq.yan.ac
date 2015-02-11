@@ -1,0 +1,16 @@
+$doctype 5
+<html lang="cmn-Hans-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>#{title}
+    <script src="/images/js/traceur-runtime.min.js"></script>
+    $forall stylesheet <- stylesheets
+      <link rel="stylesheet" href=#{stylesheet}>
+  <body>
+    <nav id="navbar">
+      <h1 id="home-link"><a href=@{Home}>言韵·友谊赛</a></h1><h1 id="right-link"><a>个人中心</a></h1>
+    <main>
+      ^{body}
+    $forall script <- scripts
+      <script src=#{script}></script>
