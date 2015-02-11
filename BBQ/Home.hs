@@ -20,9 +20,11 @@ page = do
   let rules    = $(hamletFile "views/hamlets/home/rules.hamlet")
   let aboutUs  = $(hamletFile "views/hamlets/home/about-us.hamlet")
 
+  let registerLogin = $(hamletFile "views/hamlets/home/register-or-login.hamlet")
   ok $ toResponse $ siteLayout' "言韵·友谊赛" ([hamlet|
     ^{introBBQ}
     ^{introOL}
     ^{rules}
     ^{aboutUs}
+    ^{registerLogin}
     |]) ["/static/css/homepage.css"] [] routeFn

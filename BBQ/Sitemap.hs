@@ -47,6 +47,7 @@ siteLayout' :: String -> HtmlUrl Sitemap -> [String] -> [String] -> HtmlUrl Site
 siteLayout' title body stylesheets' scripts' = $(hamletFile "views/hamlets/layout.hamlet")
   where stylesheets = "/static/css/general.css"
                     : stylesheets'
-        scripts     = scripts'
+        scripts     = "static/js/plugins.js"
+                    : scripts'
 
 siteLayout title body = siteLayout' title body [] []
