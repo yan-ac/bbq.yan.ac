@@ -1,15 +1,18 @@
 <aside class="overlay" id="register-or-login">
-  <form id="register-form">
-    <label for="email">填写你的邮件地址
-    <input name="emial" type="email">
-    <button name="register" type="submit">获取验证邮件
+  <div class="hvcenter">
+    <h1>注册账户</h1>
+    <form id="register-form">
+      <label for="email">填写你的邮件地址
+      <input name="emial" type="email">
+      <button name="register" type="submit" class="promote-push">获取验证邮件
 
-  <form id="login-form">
-    <label for="email">注册邮箱
-    <input name="emial" type="email">
-    <label for="password">账户密码
-    <input name="password" type="password">
-    <button name="login" type="submit">登录
+    <h1>选手登录</h1>
+    <form id="login-form">
+      <label for="email">注册邮箱
+      <input name="emial" type="email">
+      <label for="password">账户密码
+      <input name="password" type="password">
+      <button name="login" type="submit" class="promote-push">登录
 
-  <button class="promote-push js-close-overlay" data-overlay="register-or-login">继续浏览</button>
-  
+    <button class="promote-push js-close-overlay" data-overlay="register-or-login">继续浏览</button>
+    
