@@ -33,8 +33,8 @@ Executable bbq
   Default-Language: Haskell2010
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs
-  Other-Modules:  Data.Account
-                  Data.VCodePool
+  Other-Modules:  Data.Accounts
+                  Data.RecordPool
                   BBQ.Sitemap
                   BBQ.Home
                   BBQ.Route

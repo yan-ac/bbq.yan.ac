@@ -16,12 +16,12 @@ import Data.Acid.Advanced      (query', update')
 import Data.Data               (Data, Typeable)
 import Happstack.Server
 
-import Data.Account
-import Data.VCodePool
+import Data.Accounts
+import Data.RecordPool
 
 data RequestState = RequestState
-  { accountState :: AcidState Accounts
-  , recordPools  :: RecordPools
+  { accountsState :: AcidState Accounts
+  , recordPools   :: RecordPools
   }
 
 -- I may introduce new features to this factory. --
@@ -47,7 +47,7 @@ class HasAcidState m st where
    getAcidState :: m (AcidState st)
 
 instance HasAcidState Handler Accounts where
-  getAcidState = accountState <$> ask
+  getAcidState = accountsState <$> ask
 
 query :: forall event m.
          ( Functor m
