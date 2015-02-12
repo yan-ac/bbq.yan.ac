@@ -71,28 +71,28 @@ $(deriveSafeCopy 0 'base ''Accounts)
 
 isValidEmailAddress = Text.Email.isValid . BS.pack
 
-insertNewAccount' :: Email -> Password -> PersonalInfo -> Accounts -> Accounts
-insertNewAccount' email pswd info pool = Accounts nextId accounts'
+insertNewAccount' :: Accounts -> Email -> Password -> PersonalInfo -> Accounts
+insertNewAccount' pool email pswd info = Accounts nextId accounts'
   where thisId  = nextAccountId pool
         (AccountId thisId') = thisId
         nextId    = AccountId (thisId' + 13)
         account   = Account thisId email pswd info
         accounts' = Ix.insert account $ accounts pool
 
-getAccountId' :: Email -> Accounts -> Maybe AccountId
-getAccountId' email pool = accountId <$> (Ix.getOne $ accounts pool @= email)
+getAccountId' :: Accounts -> Email -> Maybe AccountId
+getAccountId' pool email = accountId <$> (Ix.getOne $ accounts pool @= email)
 
-getAccount' :: AccountId -> Accounts -> Maybe Account
-getAccount' id pool = Ix.getOne $ accounts pool @= id
+getAccount' :: Accounts -> AccountId -> Maybe Account
+getAccount' pool id = Ix.getOne $ accounts pool @= id
 
-updatePassword' :: AccountId -> Password -> Accounts -> Accounts
-updatePassword' id pswd pool = pool { accounts = Ix.insert account' $ accounts pool }
-  where (Just account) = getAccount' id pool
+updatePassword' :: Accounts -> AccountId -> Password -> Accounts
+updatePassword' pool id pswd = pool { accounts = Ix.insert account' $ accounts pool }
+  where (Just account) = getAccount' pool id
         account'       = account { password = pswd }
 
-updatePersonalInformation' :: AccountId -> PersonalInfo -> Accounts -> Accounts
-updatePersonalInformation' id info pool = pool { accounts = Ix.insert account' $ accounts pool }
-  where (Just account) = getAccount' id pool
+updatePersonalInformation' :: Accounts -> AccountId -> PersonalInfo -> Accounts
+updatePersonalInformation' pool id info = pool { accounts = Ix.insert account' $ accounts pool }
+  where (Just account) = getAccount' pool id
         account'       = account { personalInfo = info }
 
 listByEmail' :: Accounts -> [Account]
@@ -106,32 +106,36 @@ initialAccountsState = Accounts
   }
 
 insertNewAccount :: Email -> Password -> PersonalInfo -> Update Accounts (Either String ())
-insertNewAccount email pswd info =
-  case getAccountId' email <$> get of
+insertNewAccount email pswd info = do
+  pool <- get
+  case getAccountId' pool email of
     Nothing -> do
-      put $ insertNewAccount' email pswd info <$> get
+      put $ insertNewAccount' pool email pswd info
       return $ Right ()
     Just _  -> return $ Left "该邮箱已被注册"
 
 updatePassword :: Email -> Password -> Update Accounts (Either String ())
-updatePassword email pswd =
-  case getAccountId' email <$> get of
+updatePassword email pswd = do
+  pool <- get
+  case getAccountId' pool email of
     Nothing -> return $ Left "用户不存在"
     Just id -> do
-      put $ updatePassword' id pswd <$> get
+      put $ updatePassword' pool id pswd
       return $ Right ()
 
 updatePersonalInformation :: AccountId -> PersonalInfo -> Update Accounts (Either String ())
-updatePersonalInformation id info =
-  case getAccount' id <$> get of
+updatePersonalInformation id info = do
+  pool <- get
+  case getAccount' pool id of
     Nothing -> return $ Left "用户不存在"
     Just _  -> do
-      put $ updatePersonalInformation' id info <$> get
+      put $ updatePersonalInformation' pool id info
       return $ Right ()
 
 checkEmailAddress :: Email -> Query Accounts (Either String ())
-checkEmailAddress email =
-  case getAccountId' email <$> ask of
+checkEmailAddress email = do
+  pool <- ask
+  case getAccountId' pool email of
     Nothing -> do
       let (Email email') = email
       if isValidEmailAddress email'
@@ -140,14 +144,16 @@ checkEmailAddress email =
     Just _  -> return $ Left "该邮箱已被注册"
 
 getAccountId :: Email -> Query Accounts (Either String AccountId)
-getAccountId email =
-  case getAccountId' email <$> ask of
+getAccountId email = do
+  pool <- ask
+  case getAccountId' pool email of
     Nothing -> return $ Left "用户不存在"
     Just id -> return $ Right id
 
 getAccount :: AccountId -> Query Accounts (Either String Account)
-getAccount id =
-  case getAccount' id <$> ask of
+getAccount id = do
+  pool <- ask
+  case getAccount' pool id of
     Nothing -> return $ Left "用户不存在"
     Just a  -> return $ Right a
 
