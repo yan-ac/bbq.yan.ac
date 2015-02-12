@@ -1,4 +1,6 @@
-{-# LANGUAGE TemplateHaskell, OverloadedStrings, QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 
 module BBQ.Home (page) where
 

@@ -1,6 +1,9 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, TypeFamilies, FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE FlexibleContexts   #-}
 
-module Data.VCodePool where
 module Data.VCodePool
   ( ExpireTime(..), VCode(..)
   , RecordKey(..), PoolType(..)

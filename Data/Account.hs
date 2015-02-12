@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, TypeFamilies #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
 
 module Data.Account
   ( AccountId(..), Email(..), Password(..), PersonalInfo, Account, Accounts
