@@ -1,11 +1,18 @@
 {-# LANGUAGE DeriveDataTypeable, TemplateHaskell, TypeFamilies, FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
 
 module Data.VCodePool where
+module Data.VCodePool
+  ( ExpireTime(..), VCode(..)
+  , RecordKey(..), PoolType(..)
+  , insertNewRecord, getKeyFromRecord, removeRecord
+  , RecordPools(..)
+  )
+  where
 
 import Data.Data               (Data, Typeable)
 import Data.SafeCopy           (base, deriveSafeCopy, SafeCopy(..))
 
-import Control.Applicative     ((<$>), (<*>))
+import Control.Applicative     ((<$>))
 import Control.Monad.Reader    (ask)
 import Control.Monad.State     (get, put)
 import Data.Acid
@@ -26,7 +33,7 @@ import Data.Account
 
 newtype ExpireTime = ExpireTime Int
   deriving (Eq, Ord, Data, Typeable, Show)
-newtype VCode = VCode String
+newtype VCode = VCode { unVCode :: String}
   deriving (Eq, Ord, Data, Typeable, Show)
 $(deriveSafeCopy 0 'base ''ExpireTime)
 $(deriveSafeCopy 0 'base ''VCode)
@@ -64,20 +71,11 @@ validateRecord vcode now = do
       then return Nothing
       else return $ Just key
 
-removeRecord :: (Typeable k, Ord k)
+removeRecord' :: (Typeable k, Ord k)
   => VCode -> Update (RecordPool k) ()
-removeRecord vcode = do
+removeRecord' vcode = do
   pool' <- Ix.deleteIx vcode <$> get
   put pool'
-
--- Helper Functions --
-getNextVCode :: IO VCode
-getNextVCode = VCode . show <$> getStdRandom (randomR (100000000000000 :: Integer, 999999999999999 :: Integer))
-
-expireIn :: ExpireTime -> IO ExpireTime
-expireIn (ExpireTime ttl) = do
-  now <- (read <$> formatTime defaultTimeLocale "%s" <$> getCurrentTime) :: IO Int
-  return $ ExpireTime $ now + ttl
 
 -- Template Haskell of Acid State breaks here.   --
 -- Writing those types manually here.            --
@@ -107,7 +105,72 @@ instance (Typeable k, SafeCopy k) => Method (RemoveRecord k) where
 instance (Typeable k, SafeCopy k) => UpdateEvent (RemoveRecord k)
 
 instance (Typeable k, SafeCopy k, Ord k) => IsAcidic (RecordPool k) where
-  acidEvents = [ UpdateEvent (\(NewRecord key vcode etime) -> newRecord key vcode etime)
+  acidEvents = [ UpdateEvent (\(NewRecord key vcode etime) -> newRecord key  vcode etime)
                , QueryEvent  (\(ValidateRecord vcode now)  -> validateRecord vcode now)
-               , UpdateEvent (\(RemoveRecord vcode)        -> removeRecord vcode)
+               , UpdateEvent (\(RemoveRecord vcode)        -> removeRecord'  vcode)
                ]
+
+-- Helper Functions --
+getNextVCode :: IO VCode
+getNextVCode = VCode . show <$> getStdRandom (randomR (100000000000000 :: Integer, 999999999999999 :: Integer))
+
+expireIn :: ExpireTime -> IO ExpireTime
+expireIn (ExpireTime ttl) = do
+  now <- (read <$> formatTime defaultTimeLocale "%s" <$> getCurrentTime) :: IO Int
+  return $ ExpireTime $ now + ttl
+
+data RecordPools = RecordPools {
+    getNewAccountPool :: AcidState (RecordPool Email)
+  , getResetPswdPool  :: AcidState (RecordPool Email)
+  , getCookiePool     :: AcidState (RecordPool AccountId)
+  }
+
+data RecordKey = NewAccountEmail Email
+               | ResetPswdEmail  Email
+               | CookieAccountId AccountId
+
+data PoolType = NewAccountPool
+              | ResetPswdPool
+              | CookiePool
+
+insertNewRecord :: RecordPools -> RecordKey -> IO VCode
+insertNewRecord pools key = do
+  vcode <- getNextVCode
+  case key of
+    NewAccountEmail key' -> do
+      record <- fmap (NewRecord key' vcode) (expireIn $ ExpireTime 3600)
+      update' (getNewAccountPool pools) record
+    ResetPswdEmail  key' -> do
+      record <- fmap (NewRecord key' vcode) (expireIn $ ExpireTime 3600)
+      update' (getResetPswdPool  pools) record
+    CookieAccountId key' -> do
+      record <- fmap (NewRecord key' vcode) (expireIn $ ExpireTime 900)
+      update' (getCookiePool     pools) record
+  return vcode
+
+getKeyFromRecord :: RecordPools -> PoolType -> VCode -> IO (Maybe RecordKey)
+getKeyFromRecord pools t vcode = do
+  now <- expireIn $ ExpireTime 0
+  case t of
+    NewAccountPool -> do
+      result <- query' (getNewAccountPool pools) $ ValidateRecord vcode now
+      case result of
+        Nothing -> return Nothing
+        Just x  -> return $ Just $ NewAccountEmail x
+    ResetPswdPool  -> do
+      result <- query' (getResetPswdPool  pools) $ ValidateRecord vcode now
+      case result of
+        Nothing -> return Nothing
+        Just x  -> return $ Just $ ResetPswdEmail  x
+    CookiePool     -> do
+      result <- query' (getCookiePool     pools) $ ValidateRecord vcode now
+      case result of
+        Nothing -> return Nothing
+        Just x  -> return $ Just $ CookieAccountId x
+
+removeRecord :: RecordPools -> PoolType -> VCode -> IO ()
+removeRecord pools t vcode = do
+  case t of
+    NewAccountPool -> update' (getNewAccountPool pools) $ RemoveRecord vcode
+    ResetPswdPool  -> update' (getResetPswdPool  pools) $ RemoveRecord vcode
+    CookiePool     -> update' (getCookiePool     pools) $ RemoveRecord vcode
