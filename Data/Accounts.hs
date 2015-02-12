@@ -34,6 +34,8 @@ import Data.Acid               (Query, Update, makeAcidic)
 import Data.ByteString         (ByteString(..))
 import Crypto.BCrypt           (validatePassword)
 
+import System.FilePath         ((</>))
+import Data.Acid.SafeOpen
 
 newtype AccountId = AccountId Int
   deriving (Eq, Ord, Data, Typeable)
@@ -180,3 +182,8 @@ $(makeAcidic ''Accounts
   , 'authenticate
   , 'listByEmail
   ])
+
+openAccountsState basePath action =
+  let path = basePath </> "Accounts"
+  in  withLocalState path initialAccountsState $ \st ->
+        action st

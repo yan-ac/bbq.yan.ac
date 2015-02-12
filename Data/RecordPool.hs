@@ -35,6 +35,8 @@ import System.Locale           (defaultTimeLocale)
 
 import Data.Accounts
 
+import System.FilePath         ((</>))
+import Data.Acid.SafeOpen
 
 newtype ExpireTime = ExpireTime Int
   deriving (Eq, Ord, Data, Typeable, Show)
@@ -179,3 +181,18 @@ removeRecord pools t vcode = do
     NewAccountPool -> update' (getNewAccountPool pools) $ RemoveRecord vcode
     ResetPswdPool  -> update' (getResetPswdPool  pools) $ RemoveRecord vcode
     CookiePool     -> update' (getCookiePool     pools) $ RemoveRecord vcode
+
+-- I/O --
+openRecordPools basePath action =
+  let path1 = basePath </> "Pools" </> "NewAccount"
+      path2 = basePath </> "Pools" </> "ResetPswd"
+      path3 = basePath </> "Pools" </> "Cookie"
+  in withLocalState path1 initialEmailPool     $ \st1 ->
+     withLocalState path2 initialEmailPool     $ \st2 ->
+     withLocalState path3 initialAccountIdPool $ \st3 ->
+       action $ RecordPools st1 st2 st3
+
+initialEmailPool :: RecordPool Email
+initialEmailPool = empty
+initialAccountIdPool :: RecordPool AccountId
+initialAccountIdPool = empty
