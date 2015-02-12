@@ -31,6 +31,7 @@ Executable bbq
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs
   Other-Modules:  Data.Account
+                  Data.VCodePool
                   BBQ.Sitemap
                   BBQ.Home
                   BBQ.Route
