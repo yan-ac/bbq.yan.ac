@@ -21,10 +21,13 @@ import qualified Data.List as List
 import Data.Accounts
 import Data.RecordPool
 
-newtype ProblemId = ProblemId Int
-  deriving (Eq, Ord, Data, Typeable, Show)
+import System.FilePath         ((</>))
+import Data.Acid.SafeOpen
+
+newtype ProblemId = ProblemId { unProblemId :: Int }
+  deriving (Eq, Ord, Data, Typeable, Read, Show)
 newtype SheetId = SheetId Int
-  deriving (Eq, Ord, Data, Typeable, Show)
+  deriving (Eq, Ord, Data, Typeable, Read, Show)
 $(deriveSafeCopy 0 'base ''ProblemId)
 $(deriveSafeCopy 0 'base ''SheetId)
 
@@ -119,3 +122,9 @@ $(makeAcidic ''Participants
   , 'sortSheets
   , 'listSheets
   ])
+
+openSheetsState basePath action =
+  let path = basePath </> "Sheets"
+      initial = (Map.fromList []) :: Participants
+  in  withLocalState path initial $ \st ->
+        action st

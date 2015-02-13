@@ -16,7 +16,8 @@ import Data.AppConfig
 withAcid path action =
   openAccountsState path $ \st1 ->
   openRecordPools   path $ \st2 ->
-    action $ AppConfig st1 st2
+  openSheetsState   path $ \st3 ->
+    action $ AppConfig st1 st2 st3
 
 main :: IO ()
 main = do
