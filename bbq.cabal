@@ -12,6 +12,7 @@ Executable bbq
   Build-Depends: base,
                  text,
                  mtl,
+                 containers,
                  monad-control,
                  lifted-base,
                  filepath,

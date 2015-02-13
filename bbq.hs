@@ -9,6 +9,7 @@ import Web.Routes.Happstack    (implSite)
 import BBQ.Route
 import Data.Accounts
 import Data.RecordPool
+import Data.Sheets
 import Data.AppConfig
 
 

@@ -40,7 +40,7 @@ import System.FilePath         ((</>))
 import Data.Acid.SafeOpen
 
 newtype AccountId = AccountId Int
-  deriving (Eq, Ord, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable, Show)
 newtype Email     = Email String
   deriving (Eq, Ord, Data, Typeable, Show)
 newtype Password  = Password ByteString
@@ -52,9 +52,6 @@ $(deriveSafeCopy 0 'base ''Password)
 mkPassword = Password . BS.pack
 
 type PersonalInfo = (String, String, String)
-
-instance Show AccountId where
-  show (AccountId accountId) = show accountId
 
 data Account = Account
   { accountId    :: AccountId
