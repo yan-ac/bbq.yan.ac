@@ -41,9 +41,21 @@ Executable bbq
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs
   Other-Modules:  Data.Accounts
+                  Data.Acid.SafeOpen
                   Data.RecordPool
                   Data.AppConfig
+                  Data.Sheets
+                  Data.ValidatableForm
                   BBQ.Sitemap
+                  BBQ.Authentication
+                  BBQ.Common
+                  BBQ.Dashboard
                   BBQ.Home
+                  BBQ.JSOrder
+                  BBQ.Problems
+                  BBQ.RegisterLoginForm
+                  BBQ.Registration
+                  BBQ.SendEmail
+                  BBQ.Upload
                   BBQ.Route
   Buildable:      True
