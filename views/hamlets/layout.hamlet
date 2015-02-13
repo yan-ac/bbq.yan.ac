@@ -8,7 +8,7 @@ $doctype 5
       <link rel="stylesheet" href=#{stylesheet}>
   <body>
     <nav id="navbar">
-      <h1 id="home-link"><a href=@{Home}>言韵·友谊赛</a></h1><h1 id="right-link"><a>个人中心</a></h1>
+      <h1 id="home-link"><a href=@{Home}>言韵·友谊赛</a></h1><h1 id="right-link"><a href=@{Dashboard}>个人中心</a></h1>
     <main>
       ^{body}
     $forall script <- scripts

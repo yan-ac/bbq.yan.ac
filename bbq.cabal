@@ -34,7 +34,8 @@ Executable bbq
                  random,
                  time,
                  old-locale,
-                 either
+                 either,
+                 directory
   Default-Language: Haskell2010
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs

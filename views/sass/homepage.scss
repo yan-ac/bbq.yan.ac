@@ -1,7 +1,7 @@
 @import 'common';
 
 /* #hero */
-#hero { height: 80vh; }
+#hero { height: 85vh; }
 #hero {
   h1 {
     font-size: $h1-s-size;
@@ -34,10 +34,14 @@
 }
 /* #hero */
 
-main article:nth-child(even) {
+main .home-article-container:nth-child(even) {
   background-color: #F7F7F7;
 }
 
-main article {
-  padding: 3rem 1rem;
+.home-article-container {
+  padding: 3rem 0;
+}
+
+.overlay .js-close-overlay {
+  margin-top: 2em;
 }

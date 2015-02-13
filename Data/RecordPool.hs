@@ -8,7 +8,9 @@ module Data.RecordPool
   ( ExpireTime(..), VCode(..)
   , RecordKey(..), PoolType(..)
   , insertNewRecord, getKeyFromRecord, removeRecord
+  , expireIn
   , RecordPools(..)
+  , renewCookie
   , openRecordPools
   )
   where
@@ -182,6 +184,12 @@ removeRecord pools t vcode = do
     NewAccountPool -> update' (getNewAccountPool pools) $ RemoveRecord vcode
     ResetPswdPool  -> update' (getResetPswdPool  pools) $ RemoveRecord vcode
     CookiePool     -> update' (getCookiePool     pools) $ RemoveRecord vcode
+
+
+renewCookie :: RecordPools -> AccountId -> VCode -> ExpireTime -> IO ()
+renewCookie pools id vcode etime = do
+  let pool = getCookiePool pools
+  update' pool $ NewRecord id vcode etime
 
 -- I/O --
 openRecordPools basePath action =

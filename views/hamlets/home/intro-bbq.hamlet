@@ -1,16 +1,18 @@
-<article id="hero" class="hvcenter-container">
-  <div class="hvcenter">
-    <h1>语言学友谊赛</h1>
-    <p>2015年2月14日</p>
-    <button class="promote-push js-toggle-overlay" data-overlay="register-or-login">现在报名</button>
-    <p>继续阅读，了解更多</p>
+<div class="home-article-container">
+  <article id="hero" class="hvcenter-container">
+    <div class="hvcenter">
+      <h1>语言学友谊赛</h1>
+      <p>2015年2月14日</p>
+      <button class="promote-push js-toggle-overlay" data-overlay="register-or-login">现在报名</button>
+      <p>继续阅读，了解更多</p>
 
-<article id="intro-bbq">
-  <h1>来一场语言学烧烤？</h1>
-  <p>人类虽然没有建造成巴别塔，但却有了各式各样的语言。语言多样性（<i lang="en-US">Language Diversity</i>）让这个世界变得丰富多彩。</p>
-  <p>语言学是研究人类语言现象的学科。我们想让更多朋友体验语言学之美，便动身筹办了此次全国校际语言学友谊赛。我们邀请你一同在 2015 年 2 月 14 日烧烤语言学。</p>
+<div class="home-article-container">
+  <article id="intro-bbq">
+    <h1>来一场语言学烧烤？</h1>
+    <p>人类虽然没有建造成巴别塔，但却有了各式各样的语言。语言多样性（<i lang="en-US">Language Diversity</i>）让这个世界变得丰富多彩。</p>
+    <p>语言学是研究人类语言现象的学科。我们想让更多朋友体验语言学之美，便动身筹办了此次全国校际语言学友谊赛。我们邀请你一同在 2015 年 2 月 14 日烧烤语言学。</p>
 
-  <h1>等等，为什么是烧烤？</h1>
-  <p>我们认为，烧烤是不拘于国界的烹饪，是人类渔猎时代的回忆，和语言的产生一样标志着文明的起源，阐释了文化的多样性和包容性。</p>
-  <p>而在二月十四日，烧烤又被我们赋予别样的意义。</p>
-  <p>不多说了。带上铁签，举起柴火，准备孜然，一起来烧吧。</p>
+    <h1>等等，为什么是烧烤？</h1>
+    <p>我们认为，烧烤是不拘于国界的烹饪，是人类渔猎时代的回忆，和语言的产生一样标志着文明的起源，阐释了文化的多样性和包容性。</p>
+    <p>而在二月十四日，烧烤又被我们赋予别样的意义。</p>
+    <p>不多说了。带上铁签，举起柴火，准备孜然，一起来烧吧。</p>

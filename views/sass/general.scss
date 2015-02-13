@@ -11,6 +11,10 @@ body, main, section, nav, article, aside, footer { margin: 0; padding: 0; }
 /* IE 11: Don't Support <main> */
 main { display: block; }
 
+main {
+  margin-bottom: 4em;
+}
+
 i:lang(cmn-Hans-CN), em:lang(cmn-Hans-CN) { font-style: normal; }
 h1, a { color: $primary-color; }
 a { text-decoration: none; }
@@ -52,6 +56,13 @@ article section h1 + p, section section h1 + p {
   }
 }
 
+article {
+  max-width: 40rem;
+  margin: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 @import 'navbar';
 @import 'overlay';
 @import 'form';
@@ -75,3 +86,24 @@ button.promote-push {
 /* button.promote-push */
 
 @import 'hvcenter';
+
+dl.in-one-line {
+  dd, dt {
+    display: inline-block;
+    margin: 0;
+    box-sizing: border;
+  }
+
+  dt {
+    width: 25%;
+    text-align: right;
+  }
+  dd {
+    padding-left: 2em;
+    width: 60%;
+  }
+}
+
+td {
+  padding: 0 1em;
+}

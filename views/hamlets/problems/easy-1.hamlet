@@ -1,0 +1,36 @@
+<article>
+  <h1>简单题　甲</h1>
+  <p>以下是某语言的一些动词。</p>
+  <dl class="in-one-line">
+    <dt>binom</dt><dd lang="Latn">他是</dd>
+    <dt>cedols</dt><dd lang="Latn">你们想</dd>
+    <dt>esagol</dt><dd lang="Latn">你说过了</dd>
+    <dt>golol</dt><dd lang="Latn">你走</dd>
+    <dt>golön</dt><dd lang="Latn">走</dd>
+    <dt>ibinofs</dt><dd lang="Latn">她们曾是过了</dd>
+    <dt>logob</dt><dd lang="Latn">我看</dd>
+    <dt>löfobs</dt><dd lang="Latn">我们爱</dd>
+    <dt>pelöfob</dt><dd lang="Latn">我被爱过了</dd>
+    <dt>pätuvobs</dt><dd lang="Latn">我们被寻找</dd>
+    <dt>sagof</dt><dd lang="Latn">她说</dd>
+    <dt>sedoms</dt><dd lang="Latn">他们发送</dd>
+    <dt>tuvofs</dt><dd lang="Latn">她们寻找</dd>
+    <dt>äcedobs</dt><dd lang="Latn">我们曾思考</dd>
+
+  <p>请你将以下短语翻译成该语言。在最后提供了你需要用到的词汇。</p>
+  <ul>
+    <li>我带</li>
+    <li>你缩短</li>
+    <li>他曾感谢过了</li>
+    <li>她们曾是</li>
+    <li>你们曾扔过了</li>
+    <li>他们放过了</li>
+    <li>你曾被发送过了</li>
+    <li>我被感谢</li>
+    <li>她寻找过了</li>
+
+  <dt>blinön</dt><dd lang="Latn">带</dd>
+  <dt>brefükön</dt><dd lang="Latn">缩短</dd>
+  <dt>danön</dt><dd lang="Latn">感谢</dd>
+  <dt>jedön</dt><dd lang="Latn">扔</dd>
+  <dt>seitön</dt><dd lang="Latn">放</dd>

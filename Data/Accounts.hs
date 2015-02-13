@@ -3,10 +3,11 @@
 {-# LANGUAGE TypeFamilies       #-}
 
 module Data.Accounts
-  ( AccountId(..), Email(..), Password(..), PersonalInfo, Account, Accounts
+  ( AccountId(..), Email(..), Password(..), PersonalInfo(..), Account(..), Accounts(..)
   , openAccountsState
   , isValidEmailAddress
   , mkPassword
+  , initialAccountsState
   , InsertNewAccount(..)
   , UpdatePassword(..)
   , UpdatePersonalInformation(..)

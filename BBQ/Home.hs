@@ -20,18 +20,16 @@ import Data.AppConfig
 page :: RouteT Sitemap App Response
 page = do
   routeFn <- askRouteFn'
-  let umbuUngu = $(hamletFile "views/hamlets/problems/umbu-ungu.hamlet")
-
   let introBBQ = $(hamletFile "views/hamlets/home/intro-bbq.hamlet")
   let introOL  = $(hamletFile "views/hamlets/home/intro-ol.hamlet")
   let rules    = $(hamletFile "views/hamlets/home/rules.hamlet")
-  let aboutUs  = $(hamletFile "views/hamlets/home/about-us.hamlet")
 
   let registerLogin = $(hamletFile "views/hamlets/home/register-or-login.hamlet")
   ok $ toResponse $ siteLayout' "言韵·友谊赛" ([hamlet|
     ^{introBBQ}
-    ^{introOL}
-    ^{rules}
-    ^{aboutUs}
+    <div class="home-article-container">
+      ^{introOL}
+    <div class="home-article-container">
+      ^{rules}
     ^{registerLogin}
     |]) ["/static/css/homepage.css"] [] routeFn

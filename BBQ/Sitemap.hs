@@ -21,6 +21,7 @@ import Web.Routes.Boomerang
 
 import Data.Accounts
 import Data.RecordPool
+import Data.Sheets
 
 deriving instance Read VCode
 deriving instance PathInfo VCode
@@ -30,6 +31,12 @@ data Sitemap
   | NewRegistration
   | Registration VCode
   | Authentication
+  | Dashboard
+  | IgniteFire
+  | Upload ProblemId
+  | Problem ProblemId
+  | ViewSheets ProblemId
+  | ViewASheet ProblemId SheetId
   deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(makeBoomerangs ''Sitemap)
@@ -37,14 +44,31 @@ $(makeBoomerangs ''Sitemap)
 sitemap :: Router () (Sitemap :- ())
 sitemap =
   (  rHome
-  <> lit "register" . registration
-  <> lit "auth" . rAuthentication
+  <> lit "register"  . registration
+  <> lit "auth"      . rAuthentication
+  <> lit "dashboard" . rDashboard
+  <> lit "bbq"       . bbqOps 
+  <> lit "problems"  . rProblem </> problemIdParams
+  <> rViewASheet . ("sheet" </> problemIdParams </> sheetIdParams)
   )
   where registration = rNewRegistration </> "new"
                     <> rRegistration </> vcodeParams
+        bbqOps = rIgniteFire </> "start" 
+              <> rUpload     </> "upload" </> problemIdParams
+              <> rViewSheets </> "sheets" </> problemIdParams
 
-vcodeParams :: Router () (VCode :- ())
+vcodeParams :: Router r (VCode :- r)
 vcodeParams = xmaph (VCode . T.unpack) (Just . T.pack . unVCode) anyText
+
+--problemIdParams :: Router () (ProblemId :- ())
+problemIdParams :: Router r (ProblemId :- r)
+problemIdParams = xmaph (ProblemId) pidToInt int
+  where pidToInt (ProblemId x) = if and [x >= 1, x <= 9]
+                                 then Just x
+                                 else Nothing
+
+sheetIdParams :: Router r (SheetId :- r)
+sheetIdParams = xmaph (SheetId) (Just . unSheetId) int
 
 askRouteFn' :: MonadRoute m => m (URL m -> [(Text, Text)] -> Text)
 askRouteFn' = liftM convert $ askRouteFn

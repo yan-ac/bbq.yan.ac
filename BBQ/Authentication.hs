@@ -37,10 +37,22 @@ auth = do
     then left "邮箱或密码错误"
     else do
       (Right id) <- lift $ query $ GetAccountId email
-      return id
+      right id
 
   case result of
     Left errMsg -> unauthorized $ toJSResponse $ JSOrderError errMsg
-    Right (AccountId id) -> do
-      homeURL <- showURL Home
-      ok $ toJSResponse $ JSOrderRedirect $ homeURL
+    Right id    -> do
+      lift $ setAuthCookie id
+      dashboardURL <- showURL Dashboard
+      ok $ toJSResponse $ JSOrderRedirect $ dashboardURL
+
+loginPage :: RouteT Sitemap App Response
+loginPage = do
+  routeFn <- askRouteFn'
+  ok $ toResponse $ siteLayout "登录 | 言韵" ([hamlet|
+  <h1>登录</h1>
+  <p>由于长时间没有活动，你需要重新登录。这是出于安全考虑，对此造成的不便，我们表示抱歉。</p>
+  <form id="login-form" class="js-valform" action=@{Authentication} method="post">
+    ^{formItems}
+  |]) routeFn
+  where formItems = getFormItems safeLoginForm

@@ -26,105 +26,96 @@ import Data.Acid.SafeOpen
 
 newtype ProblemId = ProblemId { unProblemId :: Int }
   deriving (Eq, Ord, Data, Typeable, Read, Show)
-newtype SheetId = SheetId Int
+newtype SheetId = SheetId { unSheetId :: Int}
   deriving (Eq, Ord, Data, Typeable, Read, Show)
 $(deriveSafeCopy 0 'base ''ProblemId)
 $(deriveSafeCopy 0 'base ''SheetId)
 
-data Artwork = Artwork [SheetId] (Map ProblemId [SheetId])
-  deriving (Eq, Ord, Data, Typeable, Show)
-$(deriveSafeCopy 0 'base ''Artwork)
+data Sheets = Sheets {
+    nextSheetId :: SheetId
+  , getSheetSet :: Map AccountId (Map ProblemId [SheetId])
+  , getQuota    :: Map AccountId Int
+  , getEndTime  :: Map AccountId ExpireTime
+  } deriving (Eq, Ord, Data, Typeable, Show)
+$(deriveSafeCopy 0 'base ''Sheets)
 
 data BBQStatus = BBQNotStarted | BBQInProgress | BBQFinished
-  deriving (Eq, Ord, Data, Typeable, Show)
-data Participant = Participant ExpireTime Artwork
-  deriving (Eq, Ord, Data, Typeable, Show)
+  deriving (Eq, Ord, Data, Typeable, Read, Show)
 $(deriveSafeCopy 0 'base ''BBQStatus)
-$(deriveSafeCopy 0 'base ''Participant)
 
-type Participants = Map AccountId Participant
+initialSheetSet = Map.fromList [(ProblemId p, []) | p <- [1..9]]
 
-initialArtwork :: Artwork
-initialArtwork = Artwork [] $ Map.fromList [(ProblemId x, []) | x <- [1001..1009]]
-
-insertSheet' :: Artwork -> ProblemId -> SheetId -> Artwork
-insertSheet' (Artwork ss ps) pid sid = Artwork (ss ++ [sid]) (Map.insert pid (l ++ [sid]) ps)
-  where (Just l) = Map.lookup pid ps
-
-deleteSheet' :: Artwork -> ProblemId -> SheetId -> Artwork
-deleteSheet' (Artwork ss ps) pid sid = Artwork ss $ Map.insert pid (List.delete sid l) ps
-  where (Just l) = Map.lookup pid ps
-
-listSheets' :: Artwork -> ProblemId -> [SheetId]
-listSheets' (Artwork ss ps) pid = l
-  where (Just l) = Map.lookup pid ps
-
-startBBQ' :: Participants -> AccountId -> ExpireTime -> Participants
-startBBQ' pool id etime = Map.insert id participant pool
-  where participant = Participant etime $ initialArtwork
-
-getParticipantStatus' :: Participants -> AccountId -> ExpireTime -> BBQStatus
-getParticipantStatus' pool id now =
-  case Map.lookup id pool of
-    Nothing -> BBQNotStarted
-    Just (Participant etime _) ->
-      if etime > now
-      then BBQInProgress
-      else BBQFinished
-
-startBBQ :: AccountId -> ExpireTime -> Update Participants ()
+startBBQ :: AccountId -> ExpireTime -> Update Sheets ()
 startBBQ id etime = do
   pool <- get
-  put $ startBBQ' pool id etime
+  put $ pool {
+    getSheetSet = Map.insert id initialSheetSet $ getSheetSet pool
+  , getQuota    = Map.insert id 45              $    getQuota pool
+  , getEndTime  = Map.insert id etime           $  getEndTime pool
+  }
 
-getParticipantStatus :: AccountId -> ExpireTime -> Query Participants BBQStatus
-getParticipantStatus id now = do
-  pool <- ask
-  return $ getParticipantStatus' pool id now
-
-updateSheets :: AccountId -> (Artwork -> Artwork) -> Update Participants ()
-updateSheets aid f = do
+getNextSheetId :: Update Sheets SheetId
+getNextSheetId = do
   pool <- get
-  let (Just (Participant e a)) = Map.lookup aid pool
-  let a' = f a
-  let pool' = Map.insert aid (Participant e a') pool
-  put $ pool'
+  let thisId = nextSheetId pool
+  let nextId = SheetId $ 1 + unSheetId thisId
+  put $ pool { nextSheetId = nextId }
+  return thisId
 
-uploadSheet :: AccountId -> ProblemId -> SheetId -> Update Participants ()
-uploadSheet aid pid sid = updateSheets aid (\a -> insertSheet' a pid sid)
-
-deleteSheet :: AccountId -> ProblemId -> SheetId -> Update Participants ()
-deleteSheet aid pid sid = updateSheets aid (\a -> deleteSheet' a pid sid)
-
-sortSheets :: AccountId -> ProblemId -> [SheetId] -> Update Participants Bool
-sortSheets aid pid l1 = do
+appendSheet :: AccountId -> ProblemId -> SheetId -> Update Sheets ()
+appendSheet aid pid sid = do
   pool <- get
-  let (Just (Participant e (Artwork ss ps))) = Map.lookup aid pool
-  let (Just l2) = Map.lookup pid ps
-  if foldl (&&) True [elem x l2 | x <- l1]
-  then do
-    let pool' = Map.insert aid (Participant e (Artwork ss $ Map.insert pid l1 ps)) pool
-    put $ pool'
-    return True
-  else return False
+  let Just quota = Map.lookup aid $ getQuota pool
+  let Just set   = Map.lookup aid $ getSheetSet pool
+  let Just list  = Map.lookup pid set
+  let list' = list ++ [sid]
+  let set'  = Map.insert pid list' set
+  put $ pool {
+      getSheetSet = Map.insert aid set'        $ getSheetSet pool
+    , getQuota    = Map.insert aid (quota - 1) $ getQuota pool
+    }
 
-listSheets :: AccountId -> ProblemId -> Query Participants [SheetId]
+listSheets :: AccountId -> ProblemId -> Query Sheets [SheetId]
 listSheets aid pid = do
   pool <- ask
-  let (Just (Participant e a)) = Map.lookup aid pool
-  return $ listSheets' a pid
+  let Just set  = Map.lookup aid $ getSheetSet pool
+  let Just list = Map.lookup pid set
+  return list
 
-$(makeAcidic ''Participants
+getRemainQuota :: AccountId -> Query Sheets Int
+getRemainQuota aid = do
+  pool <- ask
+  let Just quota = Map.lookup aid $ getQuota pool
+  return quota
+
+getParticipantStatus :: AccountId -> ExpireTime -> Query Sheets BBQStatus
+getParticipantStatus id now = do
+  pool   <- ask
+  let etime' = Map.lookup id $ getEndTime pool
+  case etime' of
+    Nothing -> return BBQNotStarted
+    Just et -> if et > now
+               then return BBQInProgress
+               else return BBQFinished
+
+$(makeAcidic ''Sheets
   [ 'startBBQ
   , 'getParticipantStatus
-  , 'uploadSheet
-  , 'deleteSheet
-  , 'sortSheets
+  , 'getRemainQuota
+  , 'getNextSheetId
+  , 'appendSheet
   , 'listSheets
   ])
 
+initialSheetsState = Sheets {
+    nextSheetId = SheetId 11797
+  , getSheetSet = Map.fromList []
+  , getQuota    = Map.fromList []
+  , getEndTime  = Map.fromList []
+}
+
 openSheetsState basePath action =
   let path = basePath </> "Sheets"
-      initial = (Map.fromList []) :: Participants
+      initial = initialSheetsState
   in  withLocalState path initial $ \st ->
         action st

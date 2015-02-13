@@ -91,14 +91,12 @@ registrationPOST vcode = do
       Nothing -> left ("无效的验证信息，输入错误或者已过期" :: String)
       Just (NewAccountEmail email) -> do
         lift $ deleteRecord NewAccountPool vcode
-        (Right id')    <- lift $ update $ InsertNewAccount email pswd info
-        let (AccountId id) = id'
-        (VCode cookie) <- lift $ askNewRecord $ CookieAccountId id'
-        lift $ addCookie Session (mkCookie "accountId" (show id))
-        lift $ addCookie Session (mkCookie "accessKey" cookie)
+        (Right id) <- lift $ update $ InsertNewAccount email pswd info
+        right id
 
   case result of
     Left errMsg -> forbidden $ toJSResponse $ JSOrderError errMsg
-    Right _     -> do
-      homeURL <- showURL Home
-      ok $ toJSResponse $ JSOrderRedirect $ homeURL
+    Right id   -> do
+      lift $ setAuthCookie id
+      dashboardURL <- showURL Dashboard
+      ok $ toJSResponse $ JSOrderRedirect $ dashboardURL
