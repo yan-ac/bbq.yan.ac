@@ -13,19 +13,22 @@ import Control.Category  (Category(id, (.)))
 import Control.Monad     (liftM)
 import Data.Data         (Data, Typeable)
 import Data.Text         (Text)
+import qualified Data.Text as T
 import Text.Hamlet
 import Text.Boomerang.TH (makeBoomerangs)
 import Web.Routes        (PathInfo(..), MonadRoute, URL, askRouteFn)
 import Web.Routes.Boomerang
 
-newtype ArticleId = ArticleId { unArticleId :: Int }
-  deriving (Eq, Ord, Enum, Read, Show, Data, Typeable, PathInfo)
+import Data.Accounts
+import Data.RecordPool
+
+deriving instance Read VCode
+deriving instance PathInfo VCode
 
 data Sitemap
   = Home
-  | Article ArticleId
-  | UserOverview
-  | UserDetail Int Text
+  | NewRegistration
+  | Registration VCode
   deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(makeBoomerangs ''Sitemap)
@@ -33,16 +36,13 @@ $(makeBoomerangs ''Sitemap)
 sitemap :: Router () (Sitemap :- ())
 sitemap =
   (  rHome
-  <> rArticle . (lit "article" </> articleId)
-  <> lit "users" . users
+  <> lit "register" . registration
   )
-  where
-    users =  rUserOverview
-      <> rUserDetail </> int . lit "-" . anyText
+  where registration = rNewRegistration
+                    <> rRegistration </> vcodeParams
 
-articleId :: Router () (ArticleId :- ())
-articleId =
-  xmaph ArticleId (Just . unArticleId) int
+vcodeParams :: Router () (VCode :- ())
+vcodeParams = xmaph (VCode . T.unpack) (Just . T.pack . unVCode) anyText
 
 askRouteFn' :: MonadRoute m => m (URL m -> [(Text, Text)] -> Text)
 askRouteFn' = liftM convert $ askRouteFn
