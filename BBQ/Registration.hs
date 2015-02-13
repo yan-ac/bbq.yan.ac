@@ -12,6 +12,7 @@ import Text.Hamlet
 
 import BBQ.JSOrder
 import BBQ.Sitemap
+import BBQ.RegisterLoginForm
 import BBQ.SendEmail
 import BBQ.Common
 
@@ -24,12 +25,6 @@ import qualified Data.Char
 import Crypto.BCrypt
 
 -- /register/new --
-safeRegisterForm :: (Monad m, TypesafeForm m) => m Email
-safeRegisterForm = do
-  email     <- askEmail "email" "填写你的邮件地址"
-  addButton "submit" "获取验证邮件"
-  return email
-
 newRegistration :: RouteT Sitemap App Response
 newRegistration = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)

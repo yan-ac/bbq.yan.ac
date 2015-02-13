@@ -11,6 +11,7 @@ import Web.Routes       (RouteT)
 import Web.Routes.Happstack ()
 
 import BBQ.Sitemap
+import BBQ.RegisterLoginForm
 
 import Data.Accounts
 import Data.RecordPool

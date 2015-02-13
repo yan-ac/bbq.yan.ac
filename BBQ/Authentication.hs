@@ -12,6 +12,7 @@ import Text.Hamlet
 
 import BBQ.JSOrder
 import BBQ.Sitemap
+import BBQ.RegisterLoginForm
 import BBQ.SendEmail
 import BBQ.Common
 
@@ -24,13 +25,6 @@ import qualified Data.Char
 import Crypto.BCrypt
 
 -- /auth --
-safeLoginForm :: (Monad m, TypesafeForm m) => m (Email, Password)
-safeLoginForm = do
-  email    <- askEmail "email" "注册邮箱"
-  password <- askPassword "password" "账户密码"
-  addButton "login" "登录"
-  return (email, password)
-
 auth :: RouteT Sitemap App Response
 auth = do
   decodeBody (defaultBodyPolicy "/tmp/" 0 1000 1000)

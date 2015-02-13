@@ -82,3 +82,4 @@ function getValformUploadedCallback (form) {
       redirect(text.slice(8));
   }
 }
+
