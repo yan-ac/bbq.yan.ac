@@ -2,15 +2,15 @@
   <div class="hvcenter">
     <h1>注册账户</h1>
     <form id="register-form" class="js-valform" action="/register/new" method="post">
-      <label for="email">填写你的邮件地址
+      <label for="email">填写你的邮箱
       <input name="email" type="email">
       <label name="message">
       <button name="submit" type="button" class="promote-push">获取验证邮件
 
     <h1>选手登录</h1>
-    <form id="login-form" class="js-valform" action="/authentication" method="post">
+    <form id="login-form" class="js-valform" action="/auth" method="post">
       <label for="email">注册邮箱
-      <input name="emial" type="email">
+      <input name="email" type="email">
       <label for="password">账户密码
       <input name="password" type="password">
       <label name="message">

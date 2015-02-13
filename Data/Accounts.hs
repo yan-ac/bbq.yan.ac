@@ -150,7 +150,7 @@ checkEmailAddress email = do
       let (Email email') = email
       if isValidEmailAddress email'
       then return $ Right ()
-      else return $ Left "无效的邮箱地址"
+      else return $ Left "无效的邮箱"
     Just _  -> return $ Left "该邮箱已被注册"
 
 getAccountId :: Email -> Query Accounts (Either String AccountId)

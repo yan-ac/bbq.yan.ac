@@ -29,6 +29,7 @@ data Sitemap
   = Home
   | NewRegistration
   | Registration VCode
+  | Authentication
   deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(makeBoomerangs ''Sitemap)
@@ -37,6 +38,7 @@ sitemap :: Router () (Sitemap :- ())
 sitemap =
   (  rHome
   <> lit "register" . registration
+  <> lit "auth" . rAuthentication
   )
   where registration = rNewRegistration </> "new"
                     <> rRegistration </> vcodeParams
