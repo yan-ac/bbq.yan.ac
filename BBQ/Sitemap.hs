@@ -38,7 +38,7 @@ sitemap =
   (  rHome
   <> lit "register" . registration
   )
-  where registration = rNewRegistration
+  where registration = rNewRegistration </> "new"
                     <> rRegistration </> vcodeParams
 
 vcodeParams :: Router () (VCode :- ())
@@ -52,7 +52,7 @@ siteLayout' :: String -> HtmlUrl Sitemap -> [String] -> [String] -> HtmlUrl Site
 siteLayout' title body stylesheets' scripts' = $(hamletFile "views/hamlets/layout.hamlet")
   where stylesheets = "/static/css/general.css"
                     : stylesheets'
-        scripts     = "static/js/plugins.js"
+        scripts     = "/static/js/plugins.js"
                     : scripts'
 
 siteLayout title body = siteLayout' title body [] []

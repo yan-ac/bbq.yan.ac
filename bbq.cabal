@@ -32,7 +32,8 @@ Executable bbq
                  shakespeare,
                  random,
                  time,
-                 old-locale
+                 old-locale,
+                 either
   Default-Language: Haskell2010
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs

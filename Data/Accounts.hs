@@ -5,14 +5,16 @@
 module Data.Accounts
   ( AccountId(..), Email(..), Password(..), PersonalInfo, Account, Accounts
   , openAccountsState
-  , InsertNewAccount
-  , UpdatePassword
-  , UpdatePersonalInformation
-  , CheckEmailAddress
-  , GetAccountId
-  , GetAccount
-  , Authenticate
-  , ListByEmail
+  , isValidEmailAddress
+  , mkPassword
+  , InsertNewAccount(..)
+  , UpdatePassword(..)
+  , UpdatePersonalInformation(..)
+  , CheckEmailAddress(..)
+  , GetAccountId(..)
+  , GetAccount(..)
+  , Authenticate(..)
+  , ListByEmail(..)
   )
   where
 
@@ -47,6 +49,8 @@ $(deriveSafeCopy 0 'base ''AccountId)
 $(deriveSafeCopy 0 'base ''Email)
 $(deriveSafeCopy 0 'base ''Password)
 
+mkPassword = Password . BS.pack
+
 type PersonalInfo = (String, String, String)
 
 instance Show AccountId where
@@ -76,8 +80,8 @@ $(deriveSafeCopy 0 'base ''Accounts)
 
 isValidEmailAddress = Text.Email.isValid . BS.pack
 
-insertNewAccount' :: Accounts -> Email -> Password -> PersonalInfo -> Accounts
-insertNewAccount' pool email pswd info = Accounts nextId accounts'
+insertNewAccount' :: Accounts -> Email -> Password -> PersonalInfo -> (Accounts, AccountId)
+insertNewAccount' pool email pswd info = (Accounts nextId accounts', thisId)
   where thisId  = nextAccountId pool
         (AccountId thisId') = thisId
         nextId    = AccountId (thisId' + 13)
@@ -110,13 +114,14 @@ initialAccountsState = Accounts
   , accounts      = empty
   }
 
-insertNewAccount :: Email -> Password -> PersonalInfo -> Update Accounts (Either String ())
+insertNewAccount :: Email -> Password -> PersonalInfo -> Update Accounts (Either String AccountId)
 insertNewAccount email pswd info = do
   pool <- get
   case getAccountId' pool email of
     Nothing -> do
-      put $ insertNewAccount' pool email pswd info
-      return $ Right ()
+      let (pool', id) = insertNewAccount' pool email pswd info
+      put pool'
+      return $ Right id
     Just _  -> return $ Left "该邮箱已被注册"
 
 updatePassword :: Email -> Password -> Update Accounts (Either String ())
