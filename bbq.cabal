@@ -35,7 +35,8 @@ Executable bbq
                  time,
                  old-locale,
                  either,
-                 directory
+                 directory,
+                 smtp-mail
   Default-Language: Haskell2010
   Hs-Source-Dirs: .
   Main-Is:        bbq.hs
