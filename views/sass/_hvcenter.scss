@@ -1,0 +1,12 @@
+/* vertically centering */
+
+.hvcenter-container { position: relative; }
+.hvcenter {
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 100%;
+  -webkit-transform: translate(50%, -50%);
+  text-align: center;
+}

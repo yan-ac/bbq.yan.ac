@@ -1,0 +1,47 @@
+@import 'common';
+
+/* #hero */
+#hero { height: 85vh; }
+#hero {
+  h1 {
+    font-size: $h1-s-size;
+    font-weight: 300;
+    margin-bottom: 0;
+  }
+  p {
+    margin: 0.5em 0;
+    font-size: $h3-s-size;
+    font-weight: 400;
+  }
+}
+
+@media (min-width: 42rem) {
+  #hero {
+    h1 {
+      font-size: $h1-m-size;
+    }
+    p {
+      font-size: $h3-m-size;
+    }
+  }
+}
+
+@media (min-width: 62rem) {
+  #hero {
+    h1 { font-size: $h1-l-size; }
+    p { font-size: $h3-l-size; }
+  }
+}
+/* #hero */
+
+main .home-article-container:nth-child(even) {
+  background-color: #F7F7F7;
+}
+
+.home-article-container {
+  padding: 3rem 0;
+}
+
+.overlay .js-close-overlay {
+  margin-top: 2em;
+}

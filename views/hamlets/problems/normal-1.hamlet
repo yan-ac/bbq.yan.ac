@@ -1,0 +1,32 @@
+<article>
+  <h1>普通题　甲</h1>
+  <p>乙语言和丙语言有许多来自甲语言的外来词。以下表格中列出了19个甲语言的单词和对应的外来词。</p>
+  <table>
+    <thead>
+      <tr><td>甲语言</td><td>乙语言</td><td>丙语言</td><td>中文翻译</td></tr>
+    <tbody>
+      <tr><td lang="Latn">badan</td><td lang="Latn">bædæn</td><td lang="Latn">badan</td><td>身体</td></tr>
+      <tr><td lang="Latn">sala:m</td><td lang="Latn">?</td><td lang="Latn">salam</td><td>和平 </td></tr>
+      <tr><td lang="Latn">ḍarb</td><td lang="Latn">zærb</td><td lang="Latn">darab</td><td>打 </td></tr>
+      <tr><td lang="Latn">ða:hir</td><td lang="Latn">?</td><td lang="Latn">zahir</td><td>可见的</td></tr>
+      <tr><td lang="Latn">zama:n</td><td lang="Latn">zæman</td><td lang="Latn">zaman</td><td>时间</td></tr>
+      <tr><td lang="Latn">hudhud</td><td lang="Latn">?</td><td lang="Latn">hudhud</td><td>鸟 </td></tr>
+      <tr><td lang="Latn">ħala:l</td><td lang="Latn">?</td><td lang="Latn">?</td><td>允许的</td></tr>
+      <tr><td lang="Latn">θa:bit</td><td lang="Latn">sabet</td><td lang="Latn">sabit</td><td>持续的</td></tr>
+      <tr><td lang="Latn">ð̣uhr</td><td lang="Latn">zohr</td><td lang="Latn">zuhur</td><td>中午 </td></tr>
+      <tr><td lang="Latn">ħa:ḍir</td><td lang="Latn">hazer</td><td lang="Latn">hadir</td><td>现在的 </td></tr>
+      <tr><td lang="Latn">baħθ</td><td lang="Latn">?</td><td lang="Latn">?</td><td>争执 </td></tr>
+      <tr><td lang="Latn">di:n</td><td lang="Latn">din</td><td lang="Latn">?</td><td>宗教</td></tr>
+      <tr><td lang="Latn">ṣubħ</td><td lang="Latn">sobh</td><td lang="Latn">subuh</td><td>停止</td></tr>
+      <tr><td lang="Latn">ṣabr</td><td lang="Latn">?</td><td lang="Latn">?</td><td>耐心的</td></tr>
+      <tr><td lang="Latn">ða:t</td><td lang="Latn">zat</td><td lang="Latn">?</td><td>维生素</td></tr>
+      <tr><td lang="Latn">dža:hil</td><td lang="Latn">džahel</td><td lang="Latn">?</td><td>无知的 </td></tr>
+      <tr><td lang="Latn">madžlis</td><td lang="Latn">?</td><td lang="Latn">madžlis</td><td>集合 </td></tr>
+      <tr><td lang="Latn">siħr</td><td lang="Latn">sehr</td><td lang="Latn">?</td><td>巫术</td></tr>
+      <tr><td lang="Latn">la:zim</td><td lang="Latn">?</td><td lang="Latn">?</td><td>普通的</td></tr>
+
+  <p>一、填完上表</p>
+  <p>二、已知丙语言还有一个来自甲语言的外来词 <i lang="Latn">zikir</i>。请根据材料给出原本的甲语言词。
+
+  <section id="note">
+    <p>注：<i lang="Latn">◌̣</i> 代表该音是一个软腭音（抬高舌头后部发音）。

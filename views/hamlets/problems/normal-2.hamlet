@@ -1,0 +1,39 @@
+<article>
+  <h1>普通题　乙</h1>
+  <p>以下是某语言的一些句子和它们的中文翻译。</p>
+  <dl>
+    <dt lang="Latn">Gezgin uzun bellemeli esegi yeldirmeli. </dt>
+    <dd>旅行者必须用长布条把驴子往回赶。</dd>
+    <dt lang="Latn">Yeni gömlekli çilingir o siiri bellemeli. </dt>
+    <dd>穿新衬衫的木匠必须记住那诗。</dd>
+    <dt lang="Latn">Uzun yeldirmeli kiz gezgini dinlememeli. </dt>
+    <dd>穿长斗篷的女孩不用听旅行者（说话）。 </dd>
+    <dt lang="Latn">Genç çilingir yeldirilmeli. </dt>
+    <dd>年轻的木匠必须往回赶。 </dd>
+    <dt lang="Latn">O yeni saat temizlenmemeli. </dt>
+    <dd>那新的时钟不用被清理。 </dd>
+    <dt lang="Latn">Ipislak belleme oraya getirilmemeli. </dt>
+    <dd>很湿的布条不用被带来到那里。</dd>
+    <dt lang="Latn">O kiz kapkara köpegi çekmemeli. </dt>
+    <dd>那女孩不用把很黑的狗领走。</dd>
+    <dt lang="Latn">O kirli çekme temizlenmeli. </dt>
+    <dd>那脏的连衣裙必须被清理。</dd>
+    <dt lang="Latn">Sapsal köpek oraya çekilmeli. </dt>
+    <dd>懒的狗必须被领到那里。</dd>
+    <dt lang="Latn">O upuzun siir bellenmemeli.</dt>
+    <dd>那很长的诗不用被记住。</dd>
+
+  <p>一、请把下列句子翻译成中文。</p>
+  <ul>
+    <li lang="Latn">Islak köpek yeldirilmemeli.</li>
+    <li lang="Latn">Sapsal çilingir kipkirli köpegi oraya getirmeli.</li>
+    <li lang="Latn">O siir dinlenmeli.</li>
+
+  <p>二、请把下列句子翻译成该语言。</p>
+  <ul>
+    <li>穿黑色连衣裙的女孩必须带走懒的木匠。</li>
+    <li>旅行者必须清理很新的布条。</li>
+    <li>年轻女孩不用带来时钟。</li>
+
+  <section id="note">
+    <p>注：<i lang="Latn">i</i> 为元音，类似汉语拼音 <i lang="Latn">e</i>。

@@ -1,4 +1,8 @@
+.cabal-sandbox
+cabal.sandbox.config
+dist
+node_modules
+.sass-cache
+views/css
+images
 _state
-tmp
-bbq
-Config.hs

@@ -1,0 +1,20 @@
+<article>
+  <h1>你的比赛已经开始</h1>
+  <p>请抓紧时间答题。</p>
+  <p>只有将简单题、普通题、困难题各完成一道之后，方可作答奖励题。只有在给出三道常规题的明确答案后，回答的奖励题的得分才会计入总分。</p>
+  <p>除了回答每道题的答案之外，你还应当写出你所发现的该语言的规则。注意，规则约占总分的一半。<p>
+
+<article>
+  $forall (pid, title) <- problems
+    <section>
+      <h1>#{title}
+      <p><a target="_blank" href=@{Problem pid}>点击查看题目</a>
+      <p><a target="_blank" href=@{ViewSheets pid}>点击查看你已经提交的解答</a>
+      <button class="promote-push js-upload-overlay js-toggle-overlay" data-overlay="upload-overlay" data-upload=@{Upload pid}>点击提交解答</button>
+
+<aside id="upload-overlay" class="overlay">
+  <input type="file" accept="image/*" id="picture-select" style="display: block;">
+  <button onclick="process()">提交</button>
+  <button onclick="rotate(-90)">左旋 90</button>
+  <button onclick="rotate(90)">右旋 90</button>
+  <canvas id="canvas" width="1200" height="1600" style="width: 300px; height: 400px; border 1px solid black;"></canvas>

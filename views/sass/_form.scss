@@ -1,0 +1,20 @@
+form {
+  margin: 0 auto;
+  width: 20rem;
+
+  text-align: left;
+
+  input, label, button, select {
+    width: 100%;
+    display: block;
+  }
+}
+
+label {
+  margin-top: 1em; 
+  line-height: 1.3em;
+}
+input {
+  margin-bottom: 1em;
+  height: 2em;
+}

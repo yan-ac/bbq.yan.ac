@@ -1,0 +1,10 @@
+<aside class="overlay" id="register-or-login">
+  <div class="hvcenter">
+    <h1>注册账户</h1>
+    ^{registerHamlet}
+
+    <h1>选手登录</h1>
+    ^{loginHamlet}
+    
+    <button class="promote-push js-close-overlay" data-overlay="register-or-login">继续浏览</button>
+    

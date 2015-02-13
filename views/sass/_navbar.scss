@@ -1,0 +1,42 @@
+/* #navbar */
+#navbar {
+  margin: 0;
+  background-color: $primary-color;
+  max-width: 64rem;
+}
+
+#navbar {
+  h1 {
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0;
+    padding: 0.5em 1em;
+    width: 50%;
+
+    a { color: white; }
+  }
+
+  #home-link {
+    padding-right: 0;
+    text-align: left;
+  }
+
+  #right-link {
+    text-align: right;
+  }
+}
+
+@media (min-width: 64rem) {
+  #navbar {
+    padding-left: calc(50vw - 32rem);
+    padding-right: calc(50vw - 32rem);
+    background-color: white;
+    border-bottom: 2px #eee solid;
+  }
+
+  #navbar h1 {
+    font-size: $h2-s-size;
+    a { color: $primary-color; }
+  }
+}
+/* #navbar */

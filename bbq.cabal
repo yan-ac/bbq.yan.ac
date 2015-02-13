@@ -1,0 +1,48 @@
+Name:          bbq
+Version:       0.2.0
+License:       MIT
+License-File:  LICENSE
+Copyright:     (c) 2015 Yan.ac
+Author:        Minsheng Liu <i@liu.ms>
+Maintainer:    Minsheng Liu <i@liu.ms>
+Cabal-Version: >= 1.10
+Build-Type:    Simple
+
+Executable bbq
+  Build-Depends: base,
+                 text,
+                 mtl,
+                 containers,
+                 monad-control,
+                 lifted-base,
+                 filepath,
+                 acid-state,
+                 safecopy,
+                 email-validate,
+                 ixset,
+                 bytestring,
+                 bcrypt,
+                 blaze-html,
+                 boomerang,
+                 happstack,
+                 happstack-server,
+                 web-routes,
+                 web-routes-th,
+                 web-routes-happstack,
+                 web-routes-boomerang,
+                 shakespeare,
+                 random,
+                 time,
+                 old-locale,
+                 either,
+                 directory
+  Default-Language: Haskell2010
+  Hs-Source-Dirs: .
+  Main-Is:        bbq.hs
+  Other-Modules:  Data.Accounts
+                  Data.RecordPool
+                  Data.AppConfig
+                  BBQ.Sitemap
+                  BBQ.Home
+                  BBQ.Route
+  Buildable:      True
