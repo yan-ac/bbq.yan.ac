@@ -36,7 +36,8 @@ inProgressPage :: RouteT Sitemap App Response
 inProgressPage = do
   routeFn <- askRouteFn'
   let num = "一二三四五六七八九" :: String
-  let problems = [(ProblemId pid, ("题目" :: String) ++ [no]) | (pid, no) <- zip [1..9] num]
+  let titles = ["简单题　甲", "简单题　乙", "普通题　甲", "普通题　乙", "困难题　甲", "困难题　乙", "奖励题　甲", "奖励题　乙", "奖励题　丙"] :: [String]
+  let problems = [(ProblemId pid, title ) | (pid, title) <- zip [1..9] titles]
   let page = $(hamletFile "views/hamlets/in-progress-bbq.hamlet")
   ok $ toResponse $ siteLayout' "个人中心 | 言韵" page [] ["/static/js/upload.js"] routeFn
 
@@ -45,4 +46,4 @@ startBBQ id = do
   now <- lift $ expireIn' 7200
   lift $ update $ StartBBQ id now
   dashboardURL <- showURL Dashboard
-  ok $ toJSResponse $ JSOrderRedirect dashboardURL
+  lift $ ok $ toJSResponse $ JSOrderRedirect dashboardURL
