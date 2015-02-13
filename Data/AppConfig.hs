@@ -5,7 +5,7 @@
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE FlexibleInstances          #-}
 
-module Data.RequestState where
+module Data.AppConfig where
 
 import Control.Applicative     (Applicative, Alternative, (<$>))
 import Control.Monad           (MonadPlus)
@@ -19,7 +19,7 @@ import Happstack.Server
 import Data.Accounts
 import Data.RecordPool
 
-data RequestState = RequestState
+data AppConfig = AppConfig
   { accountsState :: AcidState Accounts
   , recordPools   :: RecordPools
   }
@@ -28,25 +28,25 @@ data RequestState = RequestState
 mkRequestState
   :: AcidState Accounts
   -> RecordPools
-  -> RequestState
-mkRequestState = RequestState
+  -> AppConfig
+mkRequestState = AppConfig
 
-newtype Handler a = Handler { unHandler :: ServerPartT (ReaderT RequestState IO) a }
+newtype App a = App { unApp :: ServerPartT (ReaderT AppConfig IO) a }
   deriving ( Functor, Alternative, Applicative, Monad
            , MonadPlus, MonadIO, HasRqData, ServerMonad
            , WebMonad Response, FilterMonad Response
-           , Happstack, MonadReader RequestState
+           , Happstack, MonadReader AppConfig
            )
 
-runHandler :: RequestState -> Handler a -> ServerPartT IO a
-runHandler request (Handler sp) =
+runApp :: AppConfig -> App a -> ServerPartT IO a
+runApp request (App sp) =
   mapServerPartT (flip runReaderT request) sp
 
 -- Acid.Accounts and Acid.Participation --
 class HasAcidState m st where
    getAcidState :: m (AcidState st)
 
-instance HasAcidState Handler Accounts where
+instance HasAcidState App Accounts where
   getAcidState = accountsState <$> ask
 
 query :: forall event m.
@@ -74,18 +74,18 @@ update event =
        update' (as :: AcidState (EventState event)) event
 
 -- RecordPools --
-askNewRecord :: RecordKey -> Handler VCode
+askNewRecord :: RecordKey -> App VCode
 askNewRecord key = do
   pools <- recordPools <$> ask
   liftIO $ insertNewRecord pools key
   
 
-queryRecord :: PoolType -> VCode -> Handler (Maybe RecordKey)
+queryRecord :: PoolType -> VCode -> App (Maybe RecordKey)
 queryRecord t vcode = do
   pools  <- recordPools <$> ask
   liftIO $ getKeyFromRecord pools t vcode
 
-deleteRecord :: PoolType -> VCode -> Handler ()
+deleteRecord :: PoolType -> VCode -> App ()
 deleteRecord t vcode = do
   pools  <- recordPools <$> ask
   liftIO $ removeRecord pools t vcode

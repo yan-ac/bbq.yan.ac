@@ -12,7 +12,11 @@ import Web.Routes.Happstack ()
 
 import BBQ.Sitemap
 
-page :: RouteT Sitemap (ServerPartT IO) Response
+import Data.Accounts
+import Data.RecordPool
+import Data.AppConfig
+
+page :: RouteT Sitemap App Response
 page = do
   routeFn <- askRouteFn'
   let umbuUngu = $(hamletFile "views/hamlets/problems/umbu-ungu.hamlet")

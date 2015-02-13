@@ -38,6 +38,7 @@ Executable bbq
   Main-Is:        bbq.hs
   Other-Modules:  Data.Accounts
                   Data.RecordPool
+                  Data.AppConfig
                   BBQ.Sitemap
                   BBQ.Home
                   BBQ.Route

@@ -1,17 +1,21 @@
 module BBQ.Route where
 
-import Happstack.Server     (Response, ServerPartT)
+import Happstack.Server     (Response)
 import Web.Routes           (RouteT, runRouteT, Site, setDefault)
 import Web.Routes.Boomerang (boomerangSite)
 
 import           BBQ.Sitemap
 import qualified BBQ.Home
 
-route :: Sitemap -> RouteT Sitemap (ServerPartT IO) Response
-route url =
+import Data.Accounts
+import Data.RecordPool
+import Data.AppConfig
+
+route :: Sitemap -> RouteT Sitemap App Response
+route url = do
     case url of
       Home                  -> BBQ.Home.page
 
-site :: Site Sitemap (ServerPartT IO Response)
-site =
+site :: Site Sitemap (App Response)
+site = do
   setDefault Home $ boomerangSite (runRouteT route) sitemap

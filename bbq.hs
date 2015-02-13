@@ -7,9 +7,23 @@ import Happstack.Server
 import Web.Routes.Happstack    (implSite)
 
 import BBQ.Route
+import Data.Accounts
+import Data.RecordPool
+import Data.AppConfig
+
+
+withAcid path action =
+  openAccountsState path $ \st1 ->
+  openRecordPools   path $ \st2 ->
+    action $ AppConfig st1 st2
 
 main :: IO ()
-main = simpleHTTP nullConf $ msum
+main = do
+  putStrLn "BBQ is listening on 8000."
+  withAcid  "_state" $ \acid -> simpleHTTP nullConf $ runApp acid server
+
+server :: App Response
+server = msum
   [ dir "images" $ serveDirectory DisableBrowsing [] "images"
   , dirs "static/css" $ serveDirectory DisableBrowsing [] "views/css"
   , dirs "static/js"  $ serveDirectory DisableBrowsing [] "views/js"

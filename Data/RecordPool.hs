@@ -9,6 +9,7 @@ module Data.RecordPool
   , RecordKey(..), PoolType(..)
   , insertNewRecord, getKeyFromRecord, removeRecord
   , RecordPools(..)
+  , openRecordPools
   )
   where
 
