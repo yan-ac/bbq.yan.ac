@@ -20,6 +20,10 @@ import Data.RecordPool
 import Data.Sheets
 import Data.AppConfig
 
+problems = [(ProblemId pid, title ) | (pid, title) <- zip [1..9] titles]
+  where titles = ["简单题　甲", "简单题　乙", "普通题　甲", "普通题　乙", "困难题　甲", "困难题　乙", "奖励题　甲", "奖励题　乙", "奖励题　丙"] :: [String]
+        num    = "一二三四五六七八九" :: String
+
 problemPage :: ProblemId -> RouteT Sitemap App Response
 problemPage (ProblemId id) = do
   let e1 = $(hamletFile "views/hamlets/problems/easy-1.hamlet")

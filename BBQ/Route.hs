@@ -36,6 +36,7 @@ route url = do
         [ method  GET >> BBQ.Authentication.loginPage
         , method POST >> BBQ.Authentication.auth
         ]
+      Problem pid     -> BBQ.Problems.problemPage pid
       _ -> routeBasedOnUserStat url
 
 routeBasedOnUserStat :: Sitemap -> RouteT Sitemap App Response
@@ -53,18 +54,11 @@ routeBasedOnUserStat url = do
             BBQNotStarted -> BBQ.Dashboard.notStartPage
             BBQInProgress -> BBQ.Dashboard.inProgressPage
             BBQFinished   -> BBQ.Dashboard.finishedPage
-        IgniteFire ->
-          case bbqStat of
-            BBQNotStarted -> BBQ.Dashboard.startBBQ aid
-            _ -> seeOther dashboardURL $ toResponse "你已参赛"
+        IgniteFire -> forbidden $ toResponse "比赛已经结束"
         Upload pid ->
           case bbqStat of
             BBQInProgress -> BBQ.Upload.upload aid pid
             _ -> seeOther dashboardURL $ toResponse "不在比赛中"
-        Problem pid ->
-          case bbqStat of
-            BBQNotStarted -> seeOther dashboardURL $ toResponse "尚未参赛"
-            _ -> BBQ.Problems.problemPage pid
         ViewSheets pid ->
           case bbqStat of
             BBQNotStarted -> seeOther dashboardURL $ toResponse "尚未参赛"

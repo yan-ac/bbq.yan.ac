@@ -7,8 +7,12 @@
   <p>我确认在比赛期间不会为其他选手提供帮助，不要求也不接受其他选手的帮助。</p>
   <p>我确认知悉：若我违反上述任何准则，我的比赛与评奖资格都将被取消，并且友谊赛组委会有可能将我的个人信息提供至全国语言学竞赛主办方。</p>
 
-  <form class="js-valform" id="start-bbq" action="/bbq/start" method="get">
-    <label>比赛一旦开始，将持续进行，无法暂停。请务必确保在接下来两个小时没有任何干扰，否则影响比赛，后果自负。
-    <label>请仔细阅读上述荣誉准则。一旦点击按钮开始比赛，则自动代表你同意上述荣誉准则。
-    <label name="message" for="submit"></label>
-    <button class="promote-push" name="submit" type="button">开始比赛</button>
+  <h1>烧烤节已经结束</h1>
+  <p>我们不再接受新的参赛请求，题目很快将会公布，敬请关注我们的微信公众号「言韵」。正在参赛的选手仍可继续提交赛题，直到两个小时的参赛时间结束。本次比赛的题目在此公开。</p>
+
+<article>
+  <h1>题目列表
+  $forall (pid, title) <- problems
+    <section>
+      <h1>#{title}
+      <p><a target="_blank" href=@{Problem pid}>点击查看题目</a>

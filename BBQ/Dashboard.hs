@@ -13,6 +13,7 @@ import Text.Hamlet
 import BBQ.JSOrder
 import BBQ.Sitemap
 import BBQ.Common
+import BBQ.Problems
 
 import Data.ValidatableForm
 import Data.Accounts
@@ -35,9 +36,6 @@ finishedPage = do
 inProgressPage :: RouteT Sitemap App Response
 inProgressPage = do
   routeFn <- askRouteFn'
-  let num = "一二三四五六七八九" :: String
-  let titles = ["简单题　甲", "简单题　乙", "普通题　甲", "普通题　乙", "困难题　甲", "困难题　乙", "奖励题　甲", "奖励题　乙", "奖励题　丙"] :: [String]
-  let problems = [(ProblemId pid, title ) | (pid, title) <- zip [1..9] titles]
   let page = $(hamletFile "views/hamlets/in-progress-bbq.hamlet")
   lift $ ok $ toResponse $ siteLayout' "个人中心 | 言韵" page [] ["/static/js/upload.js"] routeFn
 

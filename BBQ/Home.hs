@@ -12,6 +12,7 @@ import Web.Routes.Happstack ()
 
 import BBQ.Sitemap
 import BBQ.RegisterLoginForm
+import BBQ.Problems
 
 import Data.Accounts
 import Data.RecordPool

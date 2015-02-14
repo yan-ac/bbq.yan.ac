@@ -1,10 +1,11 @@
 <aside class="overlay" id="register-or-login">
-  <div class="hvcenter">
-    <h1>注册账户</h1>
-    ^{registerHamlet}
+  <article>
+    <h1>烧烤节已经结束</h1>
+    <p>我们不再接受新的参赛请求，题目很快将会公布，敬请关注我们的微信公众号「言韵」。正在参赛的选手仍可继续提交赛题，直到两个小时的参赛时间结束。本次比赛的题目在此公开。</p>
 
-    <h1>选手登录</h1>
-    ^{loginHamlet}
-    
-    <button class="promote-push js-close-overlay" data-overlay="register-or-login">继续浏览</button>
-    
+  <article>
+    <h1>题目列表
+    $forall (pid, title) <- problems
+      <section>
+        <h1>#{title}
+        <p><a target="_blank" href=@{Problem pid}>点击查看题目</a>
