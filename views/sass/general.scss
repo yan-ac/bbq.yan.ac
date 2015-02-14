@@ -107,3 +107,20 @@ dl.in-one-line {
 td {
   padding: 0 1em;
 }
+
+.upload-form {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.upload-form #canvas {
+  width: 300px;
+  height: 400px;
+  margin: 0 auto;
+  border: 1px grey solid;
+  display: block;
+}
+
+.upload-form .promote-push {
+  margin-top: 4em;
+}
