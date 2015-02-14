@@ -98,6 +98,9 @@ getParticipantStatus id now = do
                then return BBQInProgress
                else return BBQFinished
 
+returnAll :: Query Sheets (Map AccountId (Map ProblemId [SheetId]))
+returnAll = getSheetSet <$> ask
+
 $(makeAcidic ''Sheets
   [ 'startBBQ
   , 'getParticipantStatus
@@ -105,6 +108,7 @@ $(makeAcidic ''Sheets
   , 'getNextSheetId
   , 'appendSheet
   , 'listSheets
+  , 'returnAll
   ])
 
 initialSheetsState = Sheets {
