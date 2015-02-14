@@ -45,7 +45,7 @@ problemPage (ProblemId id) = do
 
   routeFn <- askRouteFn'
   if and [id /= 1, id /= 9]
-  then ok $ toResponse $ siteLayout' "言韵·友谊赛" p [] [] routeFn
+  then lift $ ok $ toResponse $ siteLayout' "言韵·友谊赛" p [] [] routeFn
   else case id of
-        1 -> serveFile (asContentType "application/pdf") "images/easy-1.pdf"
-        9 -> serveFile (asContentType "application/pdf") "images/bonus-3.pdf"
+        1 -> lift $ serveFile (asContentType "application/pdf") "images/easy-1.pdf"
+        9 -> lift $ serveFile (asContentType "application/pdf") "images/bonus-3.pdf"

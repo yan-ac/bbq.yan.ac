@@ -24,13 +24,13 @@ notStartPage :: RouteT Sitemap App Response
 notStartPage = do
   routeFn <- askRouteFn'
   let page = $(hamletFile "views/hamlets/not-start-bbq.hamlet")
-  ok $ toResponse $ siteLayout "个人中心 | 言韵" page routeFn
+  lift $ ok $ toResponse $ siteLayout "个人中心 | 言韵" page routeFn
 
 finishedPage :: RouteT Sitemap App Response
 finishedPage = do
   routeFn <- askRouteFn'
   let page = $(hamletFile "views/hamlets/finished-bbq.hamlet")
-  ok $ toResponse $ siteLayout "个人中心 | 言韵" page routeFn
+  lift $ ok $ toResponse $ siteLayout "个人中心 | 言韵" page routeFn
 
 inProgressPage :: RouteT Sitemap App Response
 inProgressPage = do
@@ -39,7 +39,7 @@ inProgressPage = do
   let titles = ["简单题　甲", "简单题　乙", "普通题　甲", "普通题　乙", "困难题　甲", "困难题　乙", "奖励题　甲", "奖励题　乙", "奖励题　丙"] :: [String]
   let problems = [(ProblemId pid, title ) | (pid, title) <- zip [1..9] titles]
   let page = $(hamletFile "views/hamlets/in-progress-bbq.hamlet")
-  ok $ toResponse $ siteLayout' "个人中心 | 言韵" page [] ["/static/js/upload.js"] routeFn
+  lift $ ok $ toResponse $ siteLayout' "个人中心 | 言韵" page [] ["/static/js/upload.js"] routeFn
 
 startBBQ :: AccountId -> RouteT Sitemap App Response
 startBBQ id = do

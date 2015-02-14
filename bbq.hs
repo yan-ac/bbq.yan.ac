@@ -29,6 +29,6 @@ server = msum
   [ dir "images" $ serveDirectory DisableBrowsing [] "images"
   , dirs "static/css" $ serveDirectory DisableBrowsing [] "views/css"
   , dirs "static/js"  $ serveDirectory DisableBrowsing [] "views/js"
-  , implSite "http://localhost:8000" "" site
+  , implSite "https://bbq.yan.ac" "" site
   , notFound $ toResponse ("resource not found" :: String)
   ]

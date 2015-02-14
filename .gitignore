@@ -6,3 +6,6 @@ node_modules
 views/css
 images
 _state
+tmp
+sheets
+
